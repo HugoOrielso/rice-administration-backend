@@ -9,7 +9,6 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # --ignore-scripts evita que postinstall (prisma generate) corra aquí
-# El schema aún no existe en este stage, correría en el builder
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 
@@ -23,7 +22,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Ahora sí existe prisma/schema.prisma — generamos el client y compilamos
+# DATABASE_URL dummy solo para que prisma generate no falle en build time
+# prisma generate solo lee el schema, nunca se conecta a la BD
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+
 RUN pnpm prisma:generate
 RUN pnpm build
 
@@ -49,5 +51,5 @@ USER expressjs
 
 EXPOSE 3000
 
-# Al arrancar el contenedor: aplica migraciones pendientes y levanta el servidor
+# En runtime sí usa la DATABASE_URL real de las env vars de CapRover
 CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node dist/index.mjs"]
