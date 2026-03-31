@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.mjs",
-  "exports": {
-    ".": "./dist/index.mjs"
-  },
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "source": "./src/index.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.mjs",
