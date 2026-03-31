@@ -8,7 +8,6 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-# --ignore-scripts evita que postinstall (prisma generate) corra aquí
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 
@@ -22,15 +21,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# DATABASE_URL dummy solo para que prisma generate no falle en build time
-# prisma generate solo lee el schema, nunca se conecta a la BD
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 
 RUN pnpm prisma:generate
 RUN pnpm build
 
 
-# ─── Stage 3: Runner (producción) ────────────────────────────────────────────
+# ─── Stage 3: Runner ─────────────────────────────────────────────────────────
 FROM node:22-alpine AS runner
 
 RUN apk add --no-cache libc6-compat
@@ -46,10 +43,11 @@ COPY --from=builder --chown=expressjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=expressjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=expressjs:nodejs /app/package.json ./
 COPY --from=builder --chown=expressjs:nodejs /app/prisma ./prisma
+# ↓ Esta línea es la que faltaba — sin ella Prisma 7 no encuentra la DATABASE_URL
+COPY --from=builder --chown=expressjs:nodejs /app/prisma.config.ts ./
 
 USER expressjs
 
 EXPOSE 3000
 
-# En runtime sí usa la DATABASE_URL real de las env vars de CapRover
 CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node dist/index.mjs"]
