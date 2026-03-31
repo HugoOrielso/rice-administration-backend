@@ -8,7 +8,9 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install --frozen-lockfile
+# --ignore-scripts evita que postinstall (prisma generate) corra aquí
+# El schema aún no existe en este stage, correría en el builder
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 
 # ─── Stage 2: Builder ────────────────────────────────────────────────────────
@@ -21,7 +23,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Genera el cliente de Prisma y compila con pkgroll
+# Ahora sí existe prisma/schema.prisma — generamos el client y compilamos
 RUN pnpm prisma:generate
 RUN pnpm build
 
@@ -35,13 +37,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Usuario no-root por seguridad
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 expressjs
 
-# pkgroll genera un único bundle en dist/
 COPY --from=builder --chown=expressjs:nodejs /app/dist ./dist
-# node_modules necesario para @prisma/client en runtime
 COPY --from=builder --chown=expressjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=expressjs:nodejs /app/package.json ./
 COPY --from=builder --chown=expressjs:nodejs /app/prisma ./prisma
@@ -50,5 +49,5 @@ USER expressjs
 
 EXPOSE 3000
 
-# Corre migraciones y arranca
+# Al arrancar el contenedor: aplica migraciones pendientes y levanta el servidor
 CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node dist/index.mjs"]
