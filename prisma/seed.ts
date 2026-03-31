@@ -1,5 +1,12 @@
 import bcrypt from "bcrypt";
-import { prisma } from "../src/database/db";
+import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const hashedPassword = await bcrypt.hash("12345678", 10);
@@ -21,7 +28,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error("Error ejecutando seed:", e);
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {
