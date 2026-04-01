@@ -1,88 +1,98 @@
 generator client {
-    provider = "prisma-client"
-    output   = "../src/generated/prisma"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-    provider = "postgresql"
+  provider = "postgresql"
 }
 
 model User {
-    id           String   @id @default(cuid())
-    name         String
-    email        String   @unique
-    password     String
-    role         UserRole @default(ADMIN)
-    isActive     Boolean  @default(true)
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
-    refreshToken String?
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  password     String
+  role         UserRole @default(ADMIN)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  refreshToken String?
 }
 
 enum UserRole {
-    ADMIN
-    OPERATOR
+  ADMIN
+  OPERATOR
 }
 
 model Product {
-    id       String  @id @default(cuid())
-    name     String
-    slug     String  @unique
-    imageUrl String?
-    details  String? @db.Text
+  id       String  @id @default(cuid())
+  name     String
+  slug     String  @unique
+  imageUrl String?
+  details  String? @db.Text
 
-    // venta directa por bulto
-    price    Decimal @db.Decimal(10, 2)
-    weightKg Decimal @db.Decimal(10, 2)
+  price Int @default(0)
+  stock Int     @default(0)
+  minStock Int  @default(0)
 
-    // inventario
-    stock    Int @default(0)
-    minStock Int @default(0)
+  packageLabel    String?
+  unitsPerPackage Int?
+  unitWeightGrams Decimal? @db.Decimal(10, 2)
 
-    isActive Boolean @default(true)
+  isActive Boolean @default(true)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    invoiceItems InvoiceItem[]
+  invoiceItems InvoiceItem[]
+
+  @@index([name])
+  @@index([isActive])
 }
 
 model Invoice {
-    id              String @id @default(cuid())
-    invoiceNumber   String @unique
-    customerName    String
-    customerEmail   String
-    customerPhone   String
-    customerAddress String
+  id              String @id @default(cuid())
+  invoiceNumber   String @unique
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  customerAddress String
 
-    subtotal Decimal @db.Decimal(10, 2)
-    total    Decimal @db.Decimal(10, 2)
+  subtotal Int @default(0)
+  total    Int @default(0)
 
-    status InvoiceStatus @default(PENDING)
+  status InvoiceStatus @default(PENDING)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    items InvoiceItem[]
+  items InvoiceItem[]
 }
 
 model InvoiceItem {
-    id        String @id @default(cuid())
-    invoiceId String
-    productId String
+  id        String @id @default(cuid())
+  invoiceId String
+  productId String?
 
-    productName String
-    quantity    Int
-    unitPrice   Decimal @db.Decimal(10, 2)
-    weightKg    Decimal @db.Decimal(10, 2)
-    lineTotal   Decimal @db.Decimal(10, 2)
+  productName String
+  quantity    Int
+  unitPrice   Int @default(0)
+  lineTotal   Int @default(0)
 
-    invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-    product Product @relation(fields: [productId], references: [id])
+  // snapshot del producto al momento de vender
+  packageLabel    String?
+  unitsPerPackage Int?
+  unitWeightGrams Decimal? @db.Decimal(10, 2)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([invoiceId])
+  @@index([productId])
 }
 
 enum InvoiceStatus {
-    PENDING
-    PAID
-    CANCELLED
+  PENDING
+  PAID
+  CANCELLED
 }

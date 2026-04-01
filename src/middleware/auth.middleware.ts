@@ -1,12 +1,12 @@
-// src/middlewares/auth.middleware.ts
 import type { NextFunction, Request, Response } from "express";
+import { UserRole } from "../generated/prisma/enums";
 import { verifyAccessToken } from "../utils/auth/auth.utils";
 
 export interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
     email: string;
-    role: string;
+    role: UserRole;
   };
 }
 
@@ -36,4 +36,17 @@ export function requireAuth(
       message: "Token inválido o expirado",
     });
   }
+}
+
+export function requireRole(...roles: UserRole[]) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.user?.role || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        ok: false,
+        message: "Forbidden",
+      });
+    }
+
+    next();
+  };
 }

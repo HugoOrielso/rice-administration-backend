@@ -10,7 +10,6 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.mjs",
     "build": "pkgroll",
-
     "prisma:generate": "prisma generate",
     "prisma:format": "prisma format",
     "prisma:validate": "prisma validate",
@@ -19,11 +18,9 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:migrate:status": "prisma migrate status",
     "prisma:migrate:reset": "prisma migrate reset",
-
     "db:push": "prisma db push",
     "db:pull": "prisma db pull",
     "db:studio": "prisma studio",
-
     "db:seed": "tsx prisma/seed.ts",
     "deploy:prod": "prisma migrate deploy"
   },
@@ -38,6 +35,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.1.0",
     "@types/pg": "^8.18.0",
     "pkgroll": "^2.27.0",
     "prisma": "^7.4.2",
@@ -53,6 +51,7 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
     "pg": "^8.20.0",
     "resend": "^6.9.3",
     "zod": "^4.3.6"

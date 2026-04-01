@@ -28,16 +28,18 @@ export type AggregateInvoiceItem = {
 
 export type InvoiceItemAvgAggregateOutputType = {
   quantity: number | null
-  unitPrice: runtime.Decimal | null
-  weightKg: runtime.Decimal | null
-  lineTotal: runtime.Decimal | null
+  unitPrice: number | null
+  lineTotal: number | null
+  unitsPerPackage: number | null
+  unitWeightGrams: runtime.Decimal | null
 }
 
 export type InvoiceItemSumAggregateOutputType = {
   quantity: number | null
-  unitPrice: runtime.Decimal | null
-  weightKg: runtime.Decimal | null
-  lineTotal: runtime.Decimal | null
+  unitPrice: number | null
+  lineTotal: number | null
+  unitsPerPackage: number | null
+  unitWeightGrams: runtime.Decimal | null
 }
 
 export type InvoiceItemMinAggregateOutputType = {
@@ -46,9 +48,11 @@ export type InvoiceItemMinAggregateOutputType = {
   productId: string | null
   productName: string | null
   quantity: number | null
-  unitPrice: runtime.Decimal | null
-  weightKg: runtime.Decimal | null
-  lineTotal: runtime.Decimal | null
+  unitPrice: number | null
+  lineTotal: number | null
+  packageLabel: string | null
+  unitsPerPackage: number | null
+  unitWeightGrams: runtime.Decimal | null
 }
 
 export type InvoiceItemMaxAggregateOutputType = {
@@ -57,9 +61,11 @@ export type InvoiceItemMaxAggregateOutputType = {
   productId: string | null
   productName: string | null
   quantity: number | null
-  unitPrice: runtime.Decimal | null
-  weightKg: runtime.Decimal | null
-  lineTotal: runtime.Decimal | null
+  unitPrice: number | null
+  lineTotal: number | null
+  packageLabel: string | null
+  unitsPerPackage: number | null
+  unitWeightGrams: runtime.Decimal | null
 }
 
 export type InvoiceItemCountAggregateOutputType = {
@@ -69,8 +75,10 @@ export type InvoiceItemCountAggregateOutputType = {
   productName: number
   quantity: number
   unitPrice: number
-  weightKg: number
   lineTotal: number
+  packageLabel: number
+  unitsPerPackage: number
+  unitWeightGrams: number
   _all: number
 }
 
@@ -78,15 +86,17 @@ export type InvoiceItemCountAggregateOutputType = {
 export type InvoiceItemAvgAggregateInputType = {
   quantity?: true
   unitPrice?: true
-  weightKg?: true
   lineTotal?: true
+  unitsPerPackage?: true
+  unitWeightGrams?: true
 }
 
 export type InvoiceItemSumAggregateInputType = {
   quantity?: true
   unitPrice?: true
-  weightKg?: true
   lineTotal?: true
+  unitsPerPackage?: true
+  unitWeightGrams?: true
 }
 
 export type InvoiceItemMinAggregateInputType = {
@@ -96,8 +106,10 @@ export type InvoiceItemMinAggregateInputType = {
   productName?: true
   quantity?: true
   unitPrice?: true
-  weightKg?: true
   lineTotal?: true
+  packageLabel?: true
+  unitsPerPackage?: true
+  unitWeightGrams?: true
 }
 
 export type InvoiceItemMaxAggregateInputType = {
@@ -107,8 +119,10 @@ export type InvoiceItemMaxAggregateInputType = {
   productName?: true
   quantity?: true
   unitPrice?: true
-  weightKg?: true
   lineTotal?: true
+  packageLabel?: true
+  unitsPerPackage?: true
+  unitWeightGrams?: true
 }
 
 export type InvoiceItemCountAggregateInputType = {
@@ -118,8 +132,10 @@ export type InvoiceItemCountAggregateInputType = {
   productName?: true
   quantity?: true
   unitPrice?: true
-  weightKg?: true
   lineTotal?: true
+  packageLabel?: true
+  unitsPerPackage?: true
+  unitWeightGrams?: true
   _all?: true
 }
 
@@ -212,12 +228,14 @@ export type InvoiceItemGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 export type InvoiceItemGroupByOutputType = {
   id: string
   invoiceId: string
-  productId: string
+  productId: string | null
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal
-  weightKg: runtime.Decimal
-  lineTotal: runtime.Decimal
+  unitPrice: number
+  lineTotal: number
+  packageLabel: string | null
+  unitsPerPackage: number | null
+  unitWeightGrams: runtime.Decimal | null
   _count: InvoiceItemCountAggregateOutputType | null
   _avg: InvoiceItemAvgAggregateOutputType | null
   _sum: InvoiceItemSumAggregateOutputType | null
@@ -246,25 +264,29 @@ export type InvoiceItemWhereInput = {
   NOT?: Prisma.InvoiceItemWhereInput | Prisma.InvoiceItemWhereInput[]
   id?: Prisma.StringFilter<"InvoiceItem"> | string
   invoiceId?: Prisma.StringFilter<"InvoiceItem"> | string
-  productId?: Prisma.StringFilter<"InvoiceItem"> | string
+  productId?: Prisma.StringNullableFilter<"InvoiceItem"> | string | null
   productName?: Prisma.StringFilter<"InvoiceItem"> | string
   quantity?: Prisma.IntFilter<"InvoiceItem"> | number
-  unitPrice?: Prisma.DecimalFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFilter<"InvoiceItem"> | number
+  lineTotal?: Prisma.IntFilter<"InvoiceItem"> | number
+  packageLabel?: Prisma.StringNullableFilter<"InvoiceItem"> | string | null
+  unitsPerPackage?: Prisma.IntNullableFilter<"InvoiceItem"> | number | null
+  unitWeightGrams?: Prisma.DecimalNullableFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoice?: Prisma.XOR<Prisma.InvoiceScalarRelationFilter, Prisma.InvoiceWhereInput>
-  product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
 }
 
 export type InvoiceItemOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   invoiceId?: Prisma.SortOrder
-  productId?: Prisma.SortOrder
+  productId?: Prisma.SortOrderInput | Prisma.SortOrder
   productName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
-  weightKg?: Prisma.SortOrder
   lineTotal?: Prisma.SortOrder
+  packageLabel?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitsPerPackage?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitWeightGrams?: Prisma.SortOrderInput | Prisma.SortOrder
   invoice?: Prisma.InvoiceOrderByWithRelationInput
   product?: Prisma.ProductOrderByWithRelationInput
 }
@@ -275,25 +297,29 @@ export type InvoiceItemWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.InvoiceItemWhereInput[]
   NOT?: Prisma.InvoiceItemWhereInput | Prisma.InvoiceItemWhereInput[]
   invoiceId?: Prisma.StringFilter<"InvoiceItem"> | string
-  productId?: Prisma.StringFilter<"InvoiceItem"> | string
+  productId?: Prisma.StringNullableFilter<"InvoiceItem"> | string | null
   productName?: Prisma.StringFilter<"InvoiceItem"> | string
   quantity?: Prisma.IntFilter<"InvoiceItem"> | number
-  unitPrice?: Prisma.DecimalFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFilter<"InvoiceItem"> | number
+  lineTotal?: Prisma.IntFilter<"InvoiceItem"> | number
+  packageLabel?: Prisma.StringNullableFilter<"InvoiceItem"> | string | null
+  unitsPerPackage?: Prisma.IntNullableFilter<"InvoiceItem"> | number | null
+  unitWeightGrams?: Prisma.DecimalNullableFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoice?: Prisma.XOR<Prisma.InvoiceScalarRelationFilter, Prisma.InvoiceWhereInput>
-  product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
 }, "id">
 
 export type InvoiceItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   invoiceId?: Prisma.SortOrder
-  productId?: Prisma.SortOrder
+  productId?: Prisma.SortOrderInput | Prisma.SortOrder
   productName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
-  weightKg?: Prisma.SortOrder
   lineTotal?: Prisma.SortOrder
+  packageLabel?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitsPerPackage?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitWeightGrams?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InvoiceItemCountOrderByAggregateInput
   _avg?: Prisma.InvoiceItemAvgOrderByAggregateInput
   _max?: Prisma.InvoiceItemMaxOrderByAggregateInput
@@ -307,87 +333,103 @@ export type InvoiceItemScalarWhereWithAggregatesInput = {
   NOT?: Prisma.InvoiceItemScalarWhereWithAggregatesInput | Prisma.InvoiceItemScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"InvoiceItem"> | string
   invoiceId?: Prisma.StringWithAggregatesFilter<"InvoiceItem"> | string
-  productId?: Prisma.StringWithAggregatesFilter<"InvoiceItem"> | string
+  productId?: Prisma.StringNullableWithAggregatesFilter<"InvoiceItem"> | string | null
   productName?: Prisma.StringWithAggregatesFilter<"InvoiceItem"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"InvoiceItem"> | number
-  unitPrice?: Prisma.DecimalWithAggregatesFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalWithAggregatesFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalWithAggregatesFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntWithAggregatesFilter<"InvoiceItem"> | number
+  lineTotal?: Prisma.IntWithAggregatesFilter<"InvoiceItem"> | number
+  packageLabel?: Prisma.StringNullableWithAggregatesFilter<"InvoiceItem"> | string | null
+  unitsPerPackage?: Prisma.IntNullableWithAggregatesFilter<"InvoiceItem"> | number | null
+  unitWeightGrams?: Prisma.DecimalNullableWithAggregatesFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemCreateInput = {
   id?: string
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg: runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: number
+  lineTotal?: number
+  packageLabel?: string | null
+  unitsPerPackage?: number | null
+  unitWeightGrams?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoice: Prisma.InvoiceCreateNestedOneWithoutItemsInput
-  product: Prisma.ProductCreateNestedOneWithoutInvoiceItemsInput
+  product?: Prisma.ProductCreateNestedOneWithoutInvoiceItemsInput
 }
 
 export type InvoiceItemUncheckedCreateInput = {
   id?: string
   invoiceId: string
-  productId: string
+  productId?: string | null
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg: runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: number
+  lineTotal?: number
+  packageLabel?: string | null
+  unitsPerPackage?: number | null
+  unitWeightGrams?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoice?: Prisma.InvoiceUpdateOneRequiredWithoutItemsNestedInput
-  product?: Prisma.ProductUpdateOneRequiredWithoutInvoiceItemsNestedInput
+  product?: Prisma.ProductUpdateOneWithoutInvoiceItemsNestedInput
 }
 
 export type InvoiceItemUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   invoiceId?: Prisma.StringFieldUpdateOperationsInput | string
-  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemCreateManyInput = {
   id?: string
   invoiceId: string
-  productId: string
+  productId?: string | null
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg: runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: number
+  lineTotal?: number
+  packageLabel?: string | null
+  unitsPerPackage?: number | null
+  unitWeightGrams?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   invoiceId?: Prisma.StringFieldUpdateOperationsInput | string
-  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemListRelationFilter = {
@@ -407,15 +449,18 @@ export type InvoiceItemCountOrderByAggregateInput = {
   productName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
-  weightKg?: Prisma.SortOrder
   lineTotal?: Prisma.SortOrder
+  packageLabel?: Prisma.SortOrder
+  unitsPerPackage?: Prisma.SortOrder
+  unitWeightGrams?: Prisma.SortOrder
 }
 
 export type InvoiceItemAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
-  weightKg?: Prisma.SortOrder
   lineTotal?: Prisma.SortOrder
+  unitsPerPackage?: Prisma.SortOrder
+  unitWeightGrams?: Prisma.SortOrder
 }
 
 export type InvoiceItemMaxOrderByAggregateInput = {
@@ -425,8 +470,10 @@ export type InvoiceItemMaxOrderByAggregateInput = {
   productName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
-  weightKg?: Prisma.SortOrder
   lineTotal?: Prisma.SortOrder
+  packageLabel?: Prisma.SortOrder
+  unitsPerPackage?: Prisma.SortOrder
+  unitWeightGrams?: Prisma.SortOrder
 }
 
 export type InvoiceItemMinOrderByAggregateInput = {
@@ -436,15 +483,18 @@ export type InvoiceItemMinOrderByAggregateInput = {
   productName?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
-  weightKg?: Prisma.SortOrder
   lineTotal?: Prisma.SortOrder
+  packageLabel?: Prisma.SortOrder
+  unitsPerPackage?: Prisma.SortOrder
+  unitWeightGrams?: Prisma.SortOrder
 }
 
 export type InvoiceItemSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   unitPrice?: Prisma.SortOrder
-  weightKg?: Prisma.SortOrder
   lineTotal?: Prisma.SortOrder
+  unitsPerPackage?: Prisma.SortOrder
+  unitWeightGrams?: Prisma.SortOrder
 }
 
 export type InvoiceItemCreateNestedManyWithoutProductInput = {
@@ -535,9 +585,11 @@ export type InvoiceItemCreateWithoutProductInput = {
   id?: string
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg: runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: number
+  lineTotal?: number
+  packageLabel?: string | null
+  unitsPerPackage?: number | null
+  unitWeightGrams?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoice: Prisma.InvoiceCreateNestedOneWithoutItemsInput
 }
 
@@ -546,9 +598,11 @@ export type InvoiceItemUncheckedCreateWithoutProductInput = {
   invoiceId: string
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg: runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: number
+  lineTotal?: number
+  packageLabel?: string | null
+  unitsPerPackage?: number | null
+  unitWeightGrams?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemCreateOrConnectWithoutProductInput = {
@@ -583,32 +637,38 @@ export type InvoiceItemScalarWhereInput = {
   NOT?: Prisma.InvoiceItemScalarWhereInput | Prisma.InvoiceItemScalarWhereInput[]
   id?: Prisma.StringFilter<"InvoiceItem"> | string
   invoiceId?: Prisma.StringFilter<"InvoiceItem"> | string
-  productId?: Prisma.StringFilter<"InvoiceItem"> | string
+  productId?: Prisma.StringNullableFilter<"InvoiceItem"> | string | null
   productName?: Prisma.StringFilter<"InvoiceItem"> | string
   quantity?: Prisma.IntFilter<"InvoiceItem"> | number
-  unitPrice?: Prisma.DecimalFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFilter<"InvoiceItem"> | number
+  lineTotal?: Prisma.IntFilter<"InvoiceItem"> | number
+  packageLabel?: Prisma.StringNullableFilter<"InvoiceItem"> | string | null
+  unitsPerPackage?: Prisma.IntNullableFilter<"InvoiceItem"> | number | null
+  unitWeightGrams?: Prisma.DecimalNullableFilter<"InvoiceItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemCreateWithoutInvoiceInput = {
   id?: string
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg: runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
-  product: Prisma.ProductCreateNestedOneWithoutInvoiceItemsInput
+  unitPrice?: number
+  lineTotal?: number
+  packageLabel?: string | null
+  unitsPerPackage?: number | null
+  unitWeightGrams?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  product?: Prisma.ProductCreateNestedOneWithoutInvoiceItemsInput
 }
 
 export type InvoiceItemUncheckedCreateWithoutInvoiceInput = {
   id?: string
-  productId: string
+  productId?: string | null
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg: runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: number
+  lineTotal?: number
+  packageLabel?: string | null
+  unitsPerPackage?: number | null
+  unitWeightGrams?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemCreateOrConnectWithoutInvoiceInput = {
@@ -642,18 +702,22 @@ export type InvoiceItemCreateManyProductInput = {
   invoiceId: string
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg: runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: number
+  lineTotal?: number
+  packageLabel?: string | null
+  unitsPerPackage?: number | null
+  unitWeightGrams?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   invoice?: Prisma.InvoiceUpdateOneRequiredWithoutItemsNestedInput
 }
 
@@ -662,9 +726,11 @@ export type InvoiceItemUncheckedUpdateWithoutProductInput = {
   invoiceId?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemUncheckedUpdateManyWithoutProductInput = {
@@ -672,49 +738,59 @@ export type InvoiceItemUncheckedUpdateManyWithoutProductInput = {
   invoiceId?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemCreateManyInvoiceInput = {
   id?: string
-  productId: string
+  productId?: string | null
   productName: string
   quantity: number
-  unitPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg: runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: number
+  lineTotal?: number
+  packageLabel?: string | null
+  unitsPerPackage?: number | null
+  unitWeightGrams?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemUpdateWithoutInvoiceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  product?: Prisma.ProductUpdateOneRequiredWithoutInvoiceItemsNestedInput
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  product?: Prisma.ProductUpdateOneWithoutInvoiceItemsNestedInput
 }
 
 export type InvoiceItemUncheckedUpdateWithoutInvoiceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type InvoiceItemUncheckedUpdateManyWithoutInvoiceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unitPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  weightKg?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  lineTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  unitPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  lineTotal?: Prisma.IntFieldUpdateOperationsInput | number
+  packageLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsPerPackage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unitWeightGrams?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 
@@ -726,10 +802,12 @@ export type InvoiceItemSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   productName?: boolean
   quantity?: boolean
   unitPrice?: boolean
-  weightKg?: boolean
   lineTotal?: boolean
+  packageLabel?: boolean
+  unitsPerPackage?: boolean
+  unitWeightGrams?: boolean
   invoice?: boolean | Prisma.InvoiceDefaultArgs<ExtArgs>
-  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.InvoiceItem$productArgs<ExtArgs>
 }, ExtArgs["result"]["invoiceItem"]>
 
 export type InvoiceItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -739,10 +817,12 @@ export type InvoiceItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   productName?: boolean
   quantity?: boolean
   unitPrice?: boolean
-  weightKg?: boolean
   lineTotal?: boolean
+  packageLabel?: boolean
+  unitsPerPackage?: boolean
+  unitWeightGrams?: boolean
   invoice?: boolean | Prisma.InvoiceDefaultArgs<ExtArgs>
-  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.InvoiceItem$productArgs<ExtArgs>
 }, ExtArgs["result"]["invoiceItem"]>
 
 export type InvoiceItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -752,10 +832,12 @@ export type InvoiceItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   productName?: boolean
   quantity?: boolean
   unitPrice?: boolean
-  weightKg?: boolean
   lineTotal?: boolean
+  packageLabel?: boolean
+  unitsPerPackage?: boolean
+  unitWeightGrams?: boolean
   invoice?: boolean | Prisma.InvoiceDefaultArgs<ExtArgs>
-  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.InvoiceItem$productArgs<ExtArgs>
 }, ExtArgs["result"]["invoiceItem"]>
 
 export type InvoiceItemSelectScalar = {
@@ -765,39 +847,43 @@ export type InvoiceItemSelectScalar = {
   productName?: boolean
   quantity?: boolean
   unitPrice?: boolean
-  weightKg?: boolean
   lineTotal?: boolean
+  packageLabel?: boolean
+  unitsPerPackage?: boolean
+  unitWeightGrams?: boolean
 }
 
-export type InvoiceItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceId" | "productId" | "productName" | "quantity" | "unitPrice" | "weightKg" | "lineTotal", ExtArgs["result"]["invoiceItem"]>
+export type InvoiceItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceId" | "productId" | "productName" | "quantity" | "unitPrice" | "lineTotal" | "packageLabel" | "unitsPerPackage" | "unitWeightGrams", ExtArgs["result"]["invoiceItem"]>
 export type InvoiceItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invoice?: boolean | Prisma.InvoiceDefaultArgs<ExtArgs>
-  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.InvoiceItem$productArgs<ExtArgs>
 }
 export type InvoiceItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invoice?: boolean | Prisma.InvoiceDefaultArgs<ExtArgs>
-  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.InvoiceItem$productArgs<ExtArgs>
 }
 export type InvoiceItemIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invoice?: boolean | Prisma.InvoiceDefaultArgs<ExtArgs>
-  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.InvoiceItem$productArgs<ExtArgs>
 }
 
 export type $InvoiceItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "InvoiceItem"
   objects: {
     invoice: Prisma.$InvoicePayload<ExtArgs>
-    product: Prisma.$ProductPayload<ExtArgs>
+    product: Prisma.$ProductPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     invoiceId: string
-    productId: string
+    productId: string | null
     productName: string
     quantity: number
-    unitPrice: runtime.Decimal
-    weightKg: runtime.Decimal
-    lineTotal: runtime.Decimal
+    unitPrice: number
+    lineTotal: number
+    packageLabel: string | null
+    unitsPerPackage: number | null
+    unitWeightGrams: runtime.Decimal | null
   }, ExtArgs["result"]["invoiceItem"]>
   composites: {}
 }
@@ -1193,7 +1279,7 @@ readonly fields: InvoiceItemFieldRefs;
 export interface Prisma__InvoiceItemClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   invoice<T extends Prisma.InvoiceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InvoiceDefaultArgs<ExtArgs>>): Prisma.Prisma__InvoiceClient<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  product<T extends Prisma.ProductDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  product<T extends Prisma.InvoiceItem$productArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InvoiceItem$productArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1228,9 +1314,11 @@ export interface InvoiceItemFieldRefs {
   readonly productId: Prisma.FieldRef<"InvoiceItem", 'String'>
   readonly productName: Prisma.FieldRef<"InvoiceItem", 'String'>
   readonly quantity: Prisma.FieldRef<"InvoiceItem", 'Int'>
-  readonly unitPrice: Prisma.FieldRef<"InvoiceItem", 'Decimal'>
-  readonly weightKg: Prisma.FieldRef<"InvoiceItem", 'Decimal'>
-  readonly lineTotal: Prisma.FieldRef<"InvoiceItem", 'Decimal'>
+  readonly unitPrice: Prisma.FieldRef<"InvoiceItem", 'Int'>
+  readonly lineTotal: Prisma.FieldRef<"InvoiceItem", 'Int'>
+  readonly packageLabel: Prisma.FieldRef<"InvoiceItem", 'String'>
+  readonly unitsPerPackage: Prisma.FieldRef<"InvoiceItem", 'Int'>
+  readonly unitWeightGrams: Prisma.FieldRef<"InvoiceItem", 'Decimal'>
 }
     
 
@@ -1629,6 +1717,25 @@ export type InvoiceItemDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many InvoiceItems to delete.
    */
   limit?: number
+}
+
+/**
+ * InvoiceItem.product
+ */
+export type InvoiceItem$productArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Product
+   */
+  select?: Prisma.ProductSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Product
+   */
+  omit?: Prisma.ProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
+  where?: Prisma.ProductWhereInput
 }
 
 /**

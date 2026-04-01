@@ -1,7 +1,7 @@
 // src/modules/auth/auth.utils.ts
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { User } from "../../generated/prisma/client";
+import { User, UserRole } from "../../generated/prisma/client";
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "access_secret";
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "refresh_secret";
@@ -23,7 +23,7 @@ export async function comparePassword(
 type TokenPayload = {
   id: string;
   email: string;
-  role: string;
+  role: UserRole;
 };
 
 export function signAccessToken(
