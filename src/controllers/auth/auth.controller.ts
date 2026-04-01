@@ -1,8 +1,7 @@
-// src/modules/auth/auth.controller.ts
 import type { Request, Response } from "express";
-import { loginSchema, refreshTokenSchema, registerSchema } from "../../../schemas/auth/auth.schema";
-import { prisma } from "../../../database/db";
-import { comparePassword, hashPassword, signAccessToken, signRefreshToken, verifyRefreshToken } from "../../../utils/auth/auth.utils";
+import { comparePassword, hashPassword, signAccessToken, signRefreshToken, verifyRefreshToken } from "../../utils/auth/auth.utils";
+import { prisma } from "../../database/db";
+import { loginSchema, registerSchema } from "../../schemas/auth/auth.schema";
 
 export async function registerUser(req: Request, res: Response) {
   try {

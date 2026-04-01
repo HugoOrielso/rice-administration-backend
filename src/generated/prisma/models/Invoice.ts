@@ -43,6 +43,8 @@ export type InvoiceMinAggregateOutputType = {
   customerEmail: string | null
   customerPhone: string | null
   customerAddress: string | null
+  documentType: $Enums.DocumentType | null
+  documentNumber: string | null
   subtotal: number | null
   total: number | null
   status: $Enums.InvoiceStatus | null
@@ -57,6 +59,8 @@ export type InvoiceMaxAggregateOutputType = {
   customerEmail: string | null
   customerPhone: string | null
   customerAddress: string | null
+  documentType: $Enums.DocumentType | null
+  documentNumber: string | null
   subtotal: number | null
   total: number | null
   status: $Enums.InvoiceStatus | null
@@ -71,6 +75,8 @@ export type InvoiceCountAggregateOutputType = {
   customerEmail: number
   customerPhone: number
   customerAddress: number
+  documentType: number
+  documentNumber: number
   subtotal: number
   total: number
   status: number
@@ -97,6 +103,8 @@ export type InvoiceMinAggregateInputType = {
   customerEmail?: true
   customerPhone?: true
   customerAddress?: true
+  documentType?: true
+  documentNumber?: true
   subtotal?: true
   total?: true
   status?: true
@@ -111,6 +119,8 @@ export type InvoiceMaxAggregateInputType = {
   customerEmail?: true
   customerPhone?: true
   customerAddress?: true
+  documentType?: true
+  documentNumber?: true
   subtotal?: true
   total?: true
   status?: true
@@ -125,6 +135,8 @@ export type InvoiceCountAggregateInputType = {
   customerEmail?: true
   customerPhone?: true
   customerAddress?: true
+  documentType?: true
+  documentNumber?: true
   subtotal?: true
   total?: true
   status?: true
@@ -226,6 +238,8 @@ export type InvoiceGroupByOutputType = {
   customerEmail: string
   customerPhone: string
   customerAddress: string
+  documentType: $Enums.DocumentType
+  documentNumber: string
   subtotal: number
   total: number
   status: $Enums.InvoiceStatus
@@ -263,6 +277,8 @@ export type InvoiceWhereInput = {
   customerEmail?: Prisma.StringFilter<"Invoice"> | string
   customerPhone?: Prisma.StringFilter<"Invoice"> | string
   customerAddress?: Prisma.StringFilter<"Invoice"> | string
+  documentType?: Prisma.EnumDocumentTypeFilter<"Invoice"> | $Enums.DocumentType
+  documentNumber?: Prisma.StringFilter<"Invoice"> | string
   subtotal?: Prisma.IntFilter<"Invoice"> | number
   total?: Prisma.IntFilter<"Invoice"> | number
   status?: Prisma.EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
@@ -278,6 +294,8 @@ export type InvoiceOrderByWithRelationInput = {
   customerEmail?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
+  documentType?: Prisma.SortOrder
+  documentNumber?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -296,6 +314,8 @@ export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   customerEmail?: Prisma.StringFilter<"Invoice"> | string
   customerPhone?: Prisma.StringFilter<"Invoice"> | string
   customerAddress?: Prisma.StringFilter<"Invoice"> | string
+  documentType?: Prisma.EnumDocumentTypeFilter<"Invoice"> | $Enums.DocumentType
+  documentNumber?: Prisma.StringFilter<"Invoice"> | string
   subtotal?: Prisma.IntFilter<"Invoice"> | number
   total?: Prisma.IntFilter<"Invoice"> | number
   status?: Prisma.EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
@@ -311,6 +331,8 @@ export type InvoiceOrderByWithAggregationInput = {
   customerEmail?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
+  documentType?: Prisma.SortOrder
+  documentNumber?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -333,6 +355,8 @@ export type InvoiceScalarWhereWithAggregatesInput = {
   customerEmail?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
   customerPhone?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
   customerAddress?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
+  documentType?: Prisma.EnumDocumentTypeWithAggregatesFilter<"Invoice"> | $Enums.DocumentType
+  documentNumber?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
   subtotal?: Prisma.IntWithAggregatesFilter<"Invoice"> | number
   total?: Prisma.IntWithAggregatesFilter<"Invoice"> | number
   status?: Prisma.EnumInvoiceStatusWithAggregatesFilter<"Invoice"> | $Enums.InvoiceStatus
@@ -347,6 +371,8 @@ export type InvoiceCreateInput = {
   customerEmail: string
   customerPhone: string
   customerAddress: string
+  documentType: $Enums.DocumentType
+  documentNumber: string
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -362,6 +388,8 @@ export type InvoiceUncheckedCreateInput = {
   customerEmail: string
   customerPhone: string
   customerAddress: string
+  documentType: $Enums.DocumentType
+  documentNumber: string
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -377,6 +405,8 @@ export type InvoiceUpdateInput = {
   customerEmail?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+  documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -392,6 +422,8 @@ export type InvoiceUncheckedUpdateInput = {
   customerEmail?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+  documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -407,6 +439,8 @@ export type InvoiceCreateManyInput = {
   customerEmail: string
   customerPhone: string
   customerAddress: string
+  documentType: $Enums.DocumentType
+  documentNumber: string
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -421,6 +455,8 @@ export type InvoiceUpdateManyMutationInput = {
   customerEmail?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+  documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -435,6 +471,8 @@ export type InvoiceUncheckedUpdateManyInput = {
   customerEmail?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+  documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -449,6 +487,8 @@ export type InvoiceCountOrderByAggregateInput = {
   customerEmail?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
+  documentType?: Prisma.SortOrder
+  documentNumber?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -468,6 +508,8 @@ export type InvoiceMaxOrderByAggregateInput = {
   customerEmail?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
+  documentType?: Prisma.SortOrder
+  documentNumber?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -482,6 +524,8 @@ export type InvoiceMinOrderByAggregateInput = {
   customerEmail?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrder
+  documentType?: Prisma.SortOrder
+  documentNumber?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -497,6 +541,10 @@ export type InvoiceSumOrderByAggregateInput = {
 export type InvoiceScalarRelationFilter = {
   is?: Prisma.InvoiceWhereInput
   isNot?: Prisma.InvoiceWhereInput
+}
+
+export type EnumDocumentTypeFieldUpdateOperationsInput = {
+  set?: $Enums.DocumentType
 }
 
 export type EnumInvoiceStatusFieldUpdateOperationsInput = {
@@ -524,6 +572,8 @@ export type InvoiceCreateWithoutItemsInput = {
   customerEmail: string
   customerPhone: string
   customerAddress: string
+  documentType: $Enums.DocumentType
+  documentNumber: string
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -538,6 +588,8 @@ export type InvoiceUncheckedCreateWithoutItemsInput = {
   customerEmail: string
   customerPhone: string
   customerAddress: string
+  documentType: $Enums.DocumentType
+  documentNumber: string
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -568,6 +620,8 @@ export type InvoiceUpdateWithoutItemsInput = {
   customerEmail?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+  documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -582,6 +636,8 @@ export type InvoiceUncheckedUpdateWithoutItemsInput = {
   customerEmail?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
+  documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -627,6 +683,8 @@ export type InvoiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   customerEmail?: boolean
   customerPhone?: boolean
   customerAddress?: boolean
+  documentType?: boolean
+  documentNumber?: boolean
   subtotal?: boolean
   total?: boolean
   status?: boolean
@@ -643,6 +701,8 @@ export type InvoiceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   customerEmail?: boolean
   customerPhone?: boolean
   customerAddress?: boolean
+  documentType?: boolean
+  documentNumber?: boolean
   subtotal?: boolean
   total?: boolean
   status?: boolean
@@ -657,6 +717,8 @@ export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   customerEmail?: boolean
   customerPhone?: boolean
   customerAddress?: boolean
+  documentType?: boolean
+  documentNumber?: boolean
   subtotal?: boolean
   total?: boolean
   status?: boolean
@@ -671,6 +733,8 @@ export type InvoiceSelectScalar = {
   customerEmail?: boolean
   customerPhone?: boolean
   customerAddress?: boolean
+  documentType?: boolean
+  documentNumber?: boolean
   subtotal?: boolean
   total?: boolean
   status?: boolean
@@ -678,7 +742,7 @@ export type InvoiceSelectScalar = {
   updatedAt?: boolean
 }
 
-export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "customerName" | "customerEmail" | "customerPhone" | "customerAddress" | "subtotal" | "total" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
+export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "customerName" | "customerEmail" | "customerPhone" | "customerAddress" | "documentType" | "documentNumber" | "subtotal" | "total" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
 export type InvoiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | Prisma.Invoice$itemsArgs<ExtArgs>
   _count?: boolean | Prisma.InvoiceCountOutputTypeDefaultArgs<ExtArgs>
@@ -698,6 +762,8 @@ export type $InvoicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     customerEmail: string
     customerPhone: string
     customerAddress: string
+    documentType: $Enums.DocumentType
+    documentNumber: string
     subtotal: number
     total: number
     status: $Enums.InvoiceStatus
@@ -1133,6 +1199,8 @@ export interface InvoiceFieldRefs {
   readonly customerEmail: Prisma.FieldRef<"Invoice", 'String'>
   readonly customerPhone: Prisma.FieldRef<"Invoice", 'String'>
   readonly customerAddress: Prisma.FieldRef<"Invoice", 'String'>
+  readonly documentType: Prisma.FieldRef<"Invoice", 'DocumentType'>
+  readonly documentNumber: Prisma.FieldRef<"Invoice", 'String'>
   readonly subtotal: Prisma.FieldRef<"Invoice", 'Int'>
   readonly total: Prisma.FieldRef<"Invoice", 'Int'>
   readonly status: Prisma.FieldRef<"Invoice", 'InvoiceStatus'>

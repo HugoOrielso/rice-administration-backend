@@ -17,12 +17,6 @@ export const createProductSchema = z.strictObject({
       "El slug solo puede contener minúsculas, números y guiones"
     ),
 
-  imageUrl: z
-    .string()
-    .trim()
-    .url("La imagen debe ser una URL válida")
-    .optional(),
-
   details: z
     .string()
     .trim()

@@ -1,20 +1,23 @@
 // src/controllers/product.controller.ts
 import { Request, Response } from "express";
-import { ProductService } from "../../../services/products/products.service";
 import path from "node:path";
 import fs from "fs";
-import { prisma } from "../../../database/db";
+import { prisma } from "../../database/db";
+import { ProductService } from "../../services/products/products.service";
+import { uploadBufferToCloudinary } from "../../utils/cloudinary/upload";
+import cloudinary from "../../config/cloudinary";
 
-type MulterRequest = Request & {
-    file?: any
-};
-
+interface MulterRequest extends Request {
+    file?: Express.Multer.File;
+}
 
 export async function createProduct(req: MulterRequest, res: Response) {
     try {
-        const imageUrl = req.file
-            ? `/uploads/products/${req.file.filename}`
-            : null;
+        let imageUrl: string | null = null;
+
+        if (req.file) {
+            imageUrl = await uploadBufferToCloudinary(req.file.buffer, "products");
+        }
 
         const product = await ProductService.create({
             ...req.body,
@@ -35,10 +38,10 @@ export async function createProduct(req: MulterRequest, res: Response) {
         console.error("createProduct error:", error);
         return res.status(500).json({
             message: "Error creando producto",
+            error: error?.message,
         });
     }
 }
-
 export async function getProducts(_req: Request, res: Response) {
     try {
         const products = await ProductService.findAll();
@@ -70,6 +73,23 @@ export async function getProductById(req: Request, res: Response) {
     }
 }
 
+
+function getCloudinaryPublicIdFromUrl(url: string): string | null {
+    try {
+        const parts = url.split("/");
+        const uploadIndex = parts.findIndex((part) => part === "upload");
+
+        if (uploadIndex === -1) return null;
+
+        const publicPath = parts.slice(uploadIndex + 2).join("/");
+        const withoutExtension = publicPath.replace(/\.[^/.]+$/, "");
+
+        return withoutExtension || null;
+    } catch {
+        return null;
+    }
+}
+
 export async function updateProduct(req: MulterRequest, res: Response) {
     try {
         const id = String(req.params.id);
@@ -86,21 +106,24 @@ export async function updateProduct(req: MulterRequest, res: Response) {
 
         let imageUrl = existingProduct.imageUrl;
 
-        // 2. Si viene nueva imagen
         if (req.file) {
-            // 👉 borrar imagen anterior si existe
-            if (existingProduct.imageUrl) {
-                const oldPath = path.resolve(
-                    "uploads",
-                    existingProduct.imageUrl.replace("/uploads/", "")
-                );
+            const newImageUrl = await uploadBufferToCloudinary(req.file.buffer, "products");
 
-                if (fs.existsSync(oldPath)) {
-                    fs.unlinkSync(oldPath);
+            if (existingProduct.imageUrl) {
+                const publicId = getCloudinaryPublicIdFromUrl(existingProduct.imageUrl);
+
+                if (publicId) {
+                    try {
+                        await cloudinary.uploader.destroy(publicId, {
+                            resource_type: "image",
+                        });
+                    } catch (destroyError) {
+                        console.error("Error borrando imagen anterior de Cloudinary:", destroyError);
+                    }
                 }
             }
 
-            imageUrl = `/uploads/products/${req.file.filename}`;
+            imageUrl = newImageUrl;
         }
 
         const product = await ProductService.update(id, {
@@ -118,6 +141,8 @@ export async function updateProduct(req: MulterRequest, res: Response) {
                 message: "Ya existe un producto con ese slug",
             });
         }
+
+        console.error("updateProduct error:", error);
 
         return res.status(500).json({
             message: "Error actualizando producto",

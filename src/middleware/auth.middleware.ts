@@ -17,7 +17,7 @@ export function requireAuth(
 ) {
   try {
     const authHeader = req.headers.authorization;
-
+    
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         ok: false,
@@ -27,7 +27,6 @@ export function requireAuth(
 
     const token = authHeader.split(" ")[1];
     const decoded = verifyAccessToken(token);
-
     req.user = decoded;
     next();
   } catch {
