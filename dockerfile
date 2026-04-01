@@ -26,8 +26,6 @@ ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN pnpm prisma:generate
 RUN pnpm build
 
-
-# ─── Stage 3: Runner ─────────────────────────────────────────────────────────
 FROM node:22-alpine AS runner
 
 RUN apk add --no-cache libc6-compat
@@ -37,14 +35,16 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 RUN addgroup --system --gid 1001 nodejs \
- && adduser  --system --uid 1001 expressjs
+ && adduser --system --uid 1001 expressjs
 
 COPY --from=builder --chown=expressjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=expressjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=expressjs:nodejs /app/package.json ./
 COPY --from=builder --chown=expressjs:nodejs /app/prisma ./prisma
-# ↓ Esta línea es la que faltaba — sin ella Prisma 7 no encuentra la DATABASE_URL
 COPY --from=builder --chown=expressjs:nodejs /app/prisma.config.ts ./
+
+RUN mkdir -p /data/uploads/products \
+ && chown -R expressjs:nodejs /data/uploads
 
 USER expressjs
 
