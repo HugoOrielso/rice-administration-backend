@@ -32,8 +32,8 @@ model Product {
   details  String? @db.Text
 
   price Int @default(0)
-  stock Int     @default(0)
-  minStock Int  @default(0)
+  stock Int @default(0)
+  minStock Int @default(0)
 
   packageLabel    String?
   unitsPerPackage Int?
@@ -58,6 +58,9 @@ model Invoice {
   customerPhone   String
   customerAddress String
 
+  documentType   DocumentType
+  documentNumber String
+
   subtotal Int @default(0)
   total    Int @default(0)
 
@@ -67,6 +70,9 @@ model Invoice {
   updatedAt DateTime @updatedAt
 
   items InvoiceItem[]
+
+  @@index([documentType])
+  @@index([documentNumber])
 }
 
 model InvoiceItem {
@@ -95,4 +101,12 @@ enum InvoiceStatus {
   PENDING
   PAID
   CANCELLED
+}
+
+enum DocumentType {
+  CEDULA_CIUDADANIA
+  NIT
+  CEDULA_EXTRANJERIA
+  RIF
+  PPT
 }
