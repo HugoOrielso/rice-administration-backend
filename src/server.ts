@@ -6,6 +6,7 @@ import path from "node:path";
 import fs from "node:fs";
 import uploadRoutes from "./router/uploads.routes";
 import paymentsRouter from "./router/payments.routes";
+import invoicesRouter from "./router/invoices.routes";
 
 const app = express();
 
@@ -39,5 +40,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/payments", paymentsRouter);
+app.use("/api/invoices", invoicesRouter);
 
 export default app;

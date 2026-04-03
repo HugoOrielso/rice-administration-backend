@@ -115,6 +115,9 @@ export async function getInvoiceByReference(req: Request, res: Response) {
       ? invoiceNumberParam[0]
       : invoiceNumberParam;
 
+      console.log("entre")
+
+      console.log(invoiceNumber)
     const invoice = await prisma.invoice.findUnique({
       where: { invoiceNumber },
     });
