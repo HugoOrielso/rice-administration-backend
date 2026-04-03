@@ -5,6 +5,7 @@ import productsRouter from "./router/products.routes";
 import path from "node:path";
 import fs from "node:fs";
 import uploadRoutes from "./router/uploads.routes";
+import paymentsRouter from "./router/payments.routes";
 
 const app = express();
 
@@ -24,7 +25,8 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://arrozandinagroup.com",
-      "https://arrozandinagroup.com/",
+      "https://arrozandinagroup.com",
+      "https://theaceous-indorsable-lilliana.ngrok-free.dev"
     ],
     credentials: true,
   })
@@ -36,5 +38,6 @@ app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 app.use("/api/auth", authRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/uploads", uploadRoutes);
+app.use("/api/payments", paymentsRouter);
 
 export default app;

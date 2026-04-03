@@ -66,6 +66,11 @@ model Invoice {
 
   status InvoiceStatus @default(PENDING)
 
+  wompiTransactionId String?
+  wompiStatus        String?
+  paymentMethodType  String?
+  wompiPayload       Json?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
