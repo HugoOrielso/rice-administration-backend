@@ -107,30 +107,3 @@ export async function wompiWebhook(req: Request, res: Response) {
   }
 }
 
-export async function getInvoiceByReference(req: Request, res: Response) {
-  try {
-    const invoiceNumberParam = req.params.invoiceNumber;
-
-    const invoiceNumber = Array.isArray(invoiceNumberParam)
-      ? invoiceNumberParam[0]
-      : invoiceNumberParam;
-
-      console.log("entre")
-
-      console.log(invoiceNumber)
-    const invoice = await prisma.invoice.findUnique({
-      where: { invoiceNumber },
-    });
-
-    if (!invoice) {
-      return res.status(404).json({ error: "Not found" });
-    }
-
-    return res.json({
-      status: invoice.status,
-    });
-
-  } catch (error) {
-    return res.status(500).json({ error: "Internal error" });
-  }
-}
