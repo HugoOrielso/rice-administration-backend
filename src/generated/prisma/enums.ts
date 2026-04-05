@@ -27,9 +27,16 @@ export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus]
 
 
 export const DocumentType = {
-  CEDULA_CIUDADANIA: 'CEDULA_CIUDADANIA',
+  RC: 'RC',
+  TE: 'TE',
+  CC: 'CC',
+  CE: 'CE',
   NIT: 'NIT',
-  CEDULA_EXTRANJERIA: 'CEDULA_EXTRANJERIA',
+  PP: 'PP',
+  TI: 'TI',
+  DNI: 'DNI',
+  RG: 'RG',
+  OTRO: 'OTRO',
   RIF: 'RIF',
   PPT: 'PPT'
 } as const

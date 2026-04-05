@@ -13,6 +13,7 @@ interface MulterRequest extends Request {
 
 export async function createProduct(req: MulterRequest, res: Response) {
     try {
+        console.log("asdsksdajij")
         let imageUrl: string | null = null;
 
         if (req.file) {

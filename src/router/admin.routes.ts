@@ -8,7 +8,6 @@ const adminRouter = Router();
 adminRouter.get(
   "/overview",
   requireAuth,
-  requireRole(UserRole.ADMIN),
   getAdminOverview
 );
 

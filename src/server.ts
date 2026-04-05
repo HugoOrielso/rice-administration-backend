@@ -8,6 +8,7 @@ import uploadRoutes from "./router/uploads.routes";
 import paymentsRouter from "./router/payments.routes";
 import invoicesRouter from "./router/invoices.routes";
 import adminRouter from "./router/admin.routes";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -21,6 +22,7 @@ fs.mkdirSync(UPLOAD_BASE_DIR, { recursive: true });
 fs.mkdirSync(path.join(UPLOAD_BASE_DIR, "products"), { recursive: true });
 
 app.use("/uploads", express.static(UPLOAD_BASE_DIR));
+app.use(cookieParser());
 
 app.use(
   cors({

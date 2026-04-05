@@ -1,6 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { UserRole } from "../generated/prisma/enums";
 import { verifyAccessToken } from "../utils/auth/auth.utils";
+import jwt from "jsonwebtoken";
+
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -17,22 +19,46 @@ export function requireAuth(
 ) {
   try {
     const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+
+    let token: string | undefined;
+
+    if (authHeader?.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    } else if (req.cookies?.accessToken) {
+      token = req.cookies.accessToken;
+    }
+
+    if (!token) {
       return res.status(401).json({
         ok: false,
         message: "Token requerido",
       });
     }
 
-    const token = authHeader.split(" ")[1];
     const decoded = verifyAccessToken(token);
     req.user = decoded;
     next();
-  } catch {
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).json({
+          ok: false,
+          message: "Token expirado",
+        });
+      }
+
+      if (error.name === "JsonWebTokenError") {
+        return res.status(401).json({
+          ok: false,
+          message: "Token inválido",
+        });
+      }
+    }
+
+    console.error("requireAuth error:", error);
     return res.status(401).json({
       ok: false,
-      message: "Token inválido o expirado",
+      message: "No autenticado",
     });
   }
 }
@@ -42,7 +68,7 @@ export function requireRole(...roles: UserRole[]) {
     if (!req.user?.role || !roles.includes(req.user.role)) {
       return res.status(403).json({
         ok: false,
-        message: "Forbidden",
+        message: "No tienes permisos para acceder a este recurso", // ✅ en español
       });
     }
 

@@ -109,9 +109,16 @@ enum InvoiceStatus {
 }
 
 enum DocumentType {
-  CEDULA_CIUDADANIA
+  RC
+  TE
+  CC
+  CE
   NIT
-  CEDULA_EXTRANJERIA
+  PP
+  TI
+  DNI
+  RG
+  OTRO
   RIF
   PPT
 }

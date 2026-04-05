@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { comparePassword, hashPassword, signAccessToken, signRefreshToken, verifyRefreshToken } from "../../utils/auth/auth.utils";
 import { prisma } from "../../database/db";
 import { loginSchema, registerSchema } from "../../schemas/auth/auth.schema";
+import { AuthenticatedRequest } from "../../middleware/auth.middleware";
 
 export async function registerUser(req: Request, res: Response) {
   try {
@@ -61,6 +62,8 @@ export async function registerUser(req: Request, res: Response) {
   }
 }
 
+
+
 export async function loginUser(req: Request, res: Response) {
   try {
     const parsed = loginSchema.safeParse(req.body);
@@ -104,9 +107,29 @@ export async function loginUser(req: Request, res: Response) {
     const accessToken = signAccessToken(user);
     const refreshToken = signRefreshToken(user);
 
+    // ✅ Guardar hash del refresh token, no el token en texto plano
     await prisma.user.update({
       where: { id: user.id },
-      data: { refreshToken },
+      data: { refreshToken: hashToken(refreshToken) },
+    });
+
+    const isProduction = process.env.NODE_ENV === "production";
+
+    // ✅ secure y sameSite dinámicos
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
+      maxAge: 1000 * 60 * 15, // ✅ 15 minutos
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
     return res.status(200).json({
@@ -120,8 +143,6 @@ export async function loginUser(req: Request, res: Response) {
           role: user.role,
           isActive: user.isActive,
         },
-        accessToken,
-        refreshToken,
       },
     });
   } catch (error) {
@@ -132,29 +153,32 @@ export async function loginUser(req: Request, res: Response) {
     });
   }
 }
-
 // Tipo compartido para el payload del token
-type TokenPayload = { id: string; email: string; role: string };
+import { createHash } from "crypto";
+
+function hashToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
 
 export async function refreshSession(req: Request, res: Response) {
   try {
-    const refreshToken = req.headers["x-refresh-token"] as string | undefined;
-
+    const refreshToken = req.cookies?.refreshToken;
+    console.log(refreshToken)
     if (!refreshToken) {
-      return res.status(400).json({
+      return res.status(401).json({
         ok: false,
-        message: "Refresh token requerido",
+        message: "No refresh token provided",
       });
     }
 
-    let payload: TokenPayload;
-
+    // ✅ try/catch propio para distinguir token inválido/expirado
+    let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
     } catch {
       return res.status(401).json({
         ok: false,
-        message: "Refresh token inválido o expirado",
+        message: "Refresh token expirado o inválido",
       });
     }
 
@@ -162,35 +186,61 @@ export async function refreshSession(req: Request, res: Response) {
       where: { id: payload.id },
     });
 
-    if (!user || !user.isActive) {
+    if (!user) {
       return res.status(401).json({
         ok: false,
-        message: "Usuario no autorizado",
+        message: "Usuario no encontrado",
       });
     }
 
-    if (!user.refreshToken || user.refreshToken !== refreshToken) {
-      return res.status(401).json({
+    // ✅ Verificar usuario activo
+    if (!user.isActive) {
+      return res.status(403).json({
         ok: false,
-        message: "Refresh token no válido",
+        message: "Usuario inactivo",
       });
     }
 
+    // ✅ Comparar contra el hash guardado en BD
+    if (user.refreshToken !== hashToken(refreshToken)) {
+      return res.status(401).json({
+        ok: false,
+        message: "Refresh token inválido",
+      });
+    }
+
+    // ✅ Rotación: generar nuevos tokens
     const newAccessToken = signAccessToken(user);
     const newRefreshToken = signRefreshToken(user);
 
+    // ✅ Guardar el hash del nuevo refresh token
     await prisma.user.update({
       where: { id: user.id },
-      data: { refreshToken: newRefreshToken },
+      data: { refreshToken: hashToken(newRefreshToken) },
     });
 
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
+      maxAge: 1000 * 60 * 15,
+    });
+
+    // ✅ Rotar la cookie del refresh token también
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+    console.log("refresh")
     return res.status(200).json({
       ok: true,
-      message: "Sesión renovada correctamente",
-      data: {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      },
+      message: "Sesión refrescada",
     });
   } catch (error) {
     console.error("refreshSession error:", error);
@@ -201,38 +251,44 @@ export async function refreshSession(req: Request, res: Response) {
   }
 }
 
+
 export async function logoutUser(req: Request, res: Response) {
   try {
-    // ✅ CORREGIDO: el refresh token debe venir en x-refresh-token, igual que en refreshSession
-    const refreshToken = req.headers["x-refresh-token"] as string | undefined;
+    const refreshToken = req.cookies.refreshToken as string | undefined;
 
-    if (!refreshToken) {
-      return res.status(400).json({
-        ok: false,
-        message: "Refresh token requerido", // ✅ Mensaje ahora es coherente
-      });
+    if (refreshToken) {
+      try {
+        const payload = verifyRefreshToken(refreshToken);
+
+        await prisma.user.updateMany({
+          where: {
+            id: payload.id,
+            refreshToken: hashToken(refreshToken), // ✅ comparar contra el hash
+          },
+          data: {
+            refreshToken: null,
+          },
+        });
+      } catch {
+        // aunque el token esté vencido o mal, seguimos cerrando sesión
+      }
     }
 
-    let payload: { id: string };
+    const isProduction = process.env.NODE_ENV === "production";
 
-    try {
-      payload = verifyRefreshToken(refreshToken);
-    } catch {
-      // Token inválido o expirado — igual se considera sesión cerrada
-      return res.status(200).json({
-        ok: true,
-        message: "Sesión cerrada",
-      });
-    }
+    // ✅ Limpiar ambas cookies, no solo refreshToken
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
+    });
 
-    await prisma.user.updateMany({
-      where: {
-        id: payload.id,
-        refreshToken,
-      },
-      data: {
-        refreshToken: null,
-      },
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
     });
 
     return res.status(200).json({
@@ -246,4 +302,18 @@ export async function logoutUser(req: Request, res: Response) {
       message: "Error interno del servidor",
     });
   }
+}
+
+export async function getMe(req: AuthenticatedRequest, res: Response) {
+  console.log("entre")
+  const user = await prisma.user.findUnique({
+    where: { id: req.user!.id },
+    select: { id: true, name: true, email: true, role: true, isActive: true },
+  });
+
+  if (!user || !user.isActive) {
+    return res.status(401).json({ ok: false, message: "No autenticado" });
+  }
+
+  return res.status(200).json({ ok: true, data: { user } });
 }
