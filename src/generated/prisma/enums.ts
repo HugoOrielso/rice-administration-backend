@@ -27,13 +27,13 @@ export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus]
 
 
 export const DocumentType = {
-  RC: 'RC',
-  TE: 'TE',
-  CC: 'CC',
-  CE: 'CE',
+  REGISTRO_CIVIL: 'REGISTRO_CIVIL',
+  TARJETA_EXTRANJERIA: 'TARJETA_EXTRANJERIA',
+  CEDULA_CIUDADANIA: 'CEDULA_CIUDADANIA',
+  CEDULA_EXTRANJERIA: 'CEDULA_EXTRANJERIA',
   NIT: 'NIT',
-  PP: 'PP',
-  TI: 'TI',
+  PASAPORTE: 'PASAPORTE',
+  TARJETA_IDENTIDAD: 'TARJETA_IDENTIDAD',
   DNI: 'DNI',
   RG: 'RG',
   OTRO: 'OTRO',
