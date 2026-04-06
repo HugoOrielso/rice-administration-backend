@@ -4,12 +4,6 @@ import { prisma } from "../../database/db";
 import { loginSchema, registerSchema } from "../../schemas/auth/auth.schema";
 import { AuthenticatedRequest } from "../../middleware/auth.middleware";
 
-const cookieOptions = {
-  httpOnly: true,
-  secure: true, // obligatorio con sameSite: "none"
-  sameSite: "none" as const,
-  path: "/",
-};
 
 export async function registerUser(req: Request, res: Response) {
   try {
@@ -119,9 +113,13 @@ export async function loginUser(req: Request, res: Response) {
       where: { id: user.id },
       data: { refreshToken: hashToken(refreshToken) },
     });
-
-
-    // ✅ secure y sameSite dinámicos
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "lax" as const,
+      path: "/",
+    };
     res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 });
     res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 7 });
 
@@ -212,11 +210,16 @@ export async function refreshSession(req: Request, res: Response) {
       data: { refreshToken: hashToken(newRefreshToken) },
     });
 
-    const isProduction = process.env.NODE_ENV === "production";
 
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "lax" as const,
+      path: "/",
+    };
     res.cookie("accessToken", newAccessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 });
     res.cookie("refreshToken", newRefreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 7 });
-
     console.log("refresh")
     return res.status(200).json({
       ok: true,
@@ -254,9 +257,16 @@ export async function logoutUser(req: Request, res: Response) {
       }
     }
 
-    const isProduction = process.env.NODE_ENV === "production";
 
-    // ✅ Limpiar ambas cookies, no solo refreshToken
+    // logoutUser — cookies
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "lax" as const,
+      path: "/",
+    };
+
     res.clearCookie("accessToken", cookieOptions);
     res.clearCookie("refreshToken", cookieOptions);
 
