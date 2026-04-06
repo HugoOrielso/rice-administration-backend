@@ -29,7 +29,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://arrozandinagroup.com",
-      "https://arrozandinagroup.com",
+      "https://frontend.arrozandinagroup.com",
       "https://theaceous-indorsable-lilliana.ngrok-free.dev"
     ],
     credentials: true,
