@@ -4,6 +4,13 @@ import { prisma } from "../../database/db";
 import { loginSchema, registerSchema } from "../../schemas/auth/auth.schema";
 import { AuthenticatedRequest } from "../../middleware/auth.middleware";
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: true, // obligatorio con sameSite: "none"
+  sameSite: "none" as const,
+  path: "/",
+};
+
 export async function registerUser(req: Request, res: Response) {
   try {
     const parsed = registerSchema.safeParse(req.body);
@@ -113,24 +120,10 @@ export async function loginUser(req: Request, res: Response) {
       data: { refreshToken: hashToken(refreshToken) },
     });
 
-    const isProduction = process.env.NODE_ENV === "production";
 
     // ✅ secure y sameSite dinámicos
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      path: "/",
-      maxAge: 1000 * 60 * 15, // ✅ 15 minutos
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      path: "/",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
+    res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 });
+    res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 7 });
 
     return res.status(200).json({
       ok: true,
@@ -221,22 +214,9 @@ export async function refreshSession(req: Request, res: Response) {
 
     const isProduction = process.env.NODE_ENV === "production";
 
-    res.cookie("accessToken", newAccessToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      path: "/",
-      maxAge: 1000 * 60 * 15,
-    });
+    res.cookie("accessToken", newAccessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 });
+    res.cookie("refreshToken", newRefreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 7 });
 
-    // ✅ Rotar la cookie del refresh token también
-    res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      path: "/",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
     console.log("refresh")
     return res.status(200).json({
       ok: true,
@@ -277,19 +257,8 @@ export async function logoutUser(req: Request, res: Response) {
     const isProduction = process.env.NODE_ENV === "production";
 
     // ✅ Limpiar ambas cookies, no solo refreshToken
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      path: "/",
-    });
-
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      path: "/",
-    });
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
 
     return res.status(200).json({
       ok: true,
