@@ -1,8 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { UserRole } from "../generated/prisma/enums";
 import { verifyAccessToken } from "../utils/auth/auth.utils";
-import jwt from "jsonwebtoken";
-
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -18,14 +16,17 @@ export function requireAuth(
   next: NextFunction
 ) {
   try {
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookiePrefix = isProduction ? "__Secure-" : "dev-";
+
     const authHeader = req.headers.authorization;
 
     let token: string | undefined;
 
     if (authHeader?.startsWith("Bearer ")) {
       token = authHeader.split(" ")[1];
-    } else if (req.cookies?.accessToken) {
-      token = req.cookies.accessToken;
+    } else if (req.cookies?.[`${cookiePrefix}accessToken`]) {
+      token = req.cookies[`${cookiePrefix}accessToken`];
     }
 
     if (!token) {
@@ -37,6 +38,7 @@ export function requireAuth(
 
     const decoded = verifyAccessToken(token);
     req.user = decoded;
+
     next();
   } catch (error) {
     if (error instanceof Error) {
@@ -64,7 +66,6 @@ export function requireAuth(
 
 export function requireRole(...roles: UserRole[]) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-
     if (!req.user?.role || !roles.includes(req.user.role)) {
       return res.status(403).json({
         ok: false,

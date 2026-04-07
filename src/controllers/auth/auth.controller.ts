@@ -113,6 +113,10 @@ export async function loginUser(req: Request, res: Response) {
       data: { refreshToken: hashToken(refreshToken) },
     });
     const isProduction = process.env.NODE_ENV === "production";
+
+    // 👇 prefijo dinámico
+    const cookiePrefix = isProduction ? "__Secure-" : "dev-";
+
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
@@ -120,8 +124,16 @@ export async function loginUser(req: Request, res: Response) {
       path: "/",
     };
 
-    res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 }); 
-    res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 8 }); 
+    // 👇 nombres con prefijo
+    res.cookie(`${cookiePrefix}accessToken`, accessToken, {
+      ...cookieOptions,
+      maxAge: 1000 * 60 * 15,
+    });
+
+    res.cookie(`${cookiePrefix}refreshToken`, refreshToken, {
+      ...cookieOptions,
+      maxAge: 1000 * 60 * 60 * 8,
+    });
 
     return res.status(200).json({
       ok: true,
@@ -153,7 +165,17 @@ function hashToken(token: string): string {
 
 export async function refreshSession(req: Request, res: Response) {
   try {
-    const refreshToken = req.cookies?.refreshToken;
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookiePrefix = isProduction ? "__Secure-" : "dev-";
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "lax" as const,
+      path: "/",
+    };
+
+    const refreshToken = req.cookies?.[`${cookiePrefix}refreshToken`] as string | undefined;
 
     if (!refreshToken) {
       return res.status(401).json({
@@ -165,7 +187,7 @@ export async function refreshSession(req: Request, res: Response) {
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
-    } catch (err) {
+    } catch {
       return res.status(401).json({
         ok: false,
         message: "Refresh token expirado o inválido",
@@ -190,7 +212,7 @@ export async function refreshSession(req: Request, res: Response) {
       });
     }
 
-    if (user.refreshToken !== hashToken(refreshToken)) {
+    if (!user.refreshToken || user.refreshToken !== hashToken(refreshToken)) {
       return res.status(401).json({
         ok: false,
         message: "Refresh token inválido",
@@ -205,7 +227,34 @@ export async function refreshSession(req: Request, res: Response) {
       data: { refreshToken: hashToken(newRefreshToken) },
     });
 
+    res.cookie(`${cookiePrefix}accessToken`, newAccessToken, {
+      ...cookieOptions,
+      maxAge: 1000 * 60 * 15,
+    });
+
+    res.cookie(`${cookiePrefix}refreshToken`, newRefreshToken, {
+      ...cookieOptions,
+      maxAge: 1000 * 60 * 60 * 8,
+    });
+
+    return res.status(200).json({
+      ok: true,
+      message: "Sesión refrescada",
+    });
+  } catch (error) {
+    console.error("refreshSession error:", error);
+
+    return res.status(500).json({
+      ok: false,
+      message: "Error interno del servidor",
+    });
+  }
+}
+export async function logoutUser(req: Request, res: Response) {
+  try {
     const isProduction = process.env.NODE_ENV === "production";
+    const cookiePrefix = isProduction ? "__Secure-" : "dev-";
+
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
@@ -213,24 +262,7 @@ export async function refreshSession(req: Request, res: Response) {
       path: "/",
     };
 
-    res.cookie("accessToken", newAccessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 });        // 15min
-    res.cookie("refreshToken", newRefreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 8 });  // 8h
-
-    return res.status(200).json({
-      ok: true,
-      message: "Sesión refrescada",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      ok: false,
-      message: "Error interno del servidor",
-    });
-  }
-}
-
-export async function logoutUser(req: Request, res: Response) {
-  try {
-    const refreshToken = req.cookies.refreshToken as string | undefined;
+    const refreshToken = req.cookies[`${cookiePrefix}refreshToken`] as string | undefined;
 
     if (refreshToken) {
       try {
@@ -239,29 +271,27 @@ export async function logoutUser(req: Request, res: Response) {
         await prisma.user.updateMany({
           where: {
             id: payload.id,
-            refreshToken: hashToken(refreshToken), // ✅ comparar contra el hash
+            refreshToken: hashToken(refreshToken),
           },
           data: {
             refreshToken: null,
           },
         });
       } catch {
-        // aunque el token esté vencido o mal, seguimos cerrando sesión
+        // seguimos cerrando sesión aunque falle la verificación
       }
     }
 
+    res.clearCookie(`${cookiePrefix}accessToken`, cookieOptions);
+    res.clearCookie(`${cookiePrefix}refreshToken`, cookieOptions);
 
-    // logoutUser — cookies
-    const isProduction = process.env.NODE_ENV === "production";
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "lax" as const,
-      path: "/",
-    };
-
-    res.clearCookie("accessToken", cookieOptions);
-    res.clearCookie("refreshToken", cookieOptions);
+    // limpiar cookies viejas si existían
+    res.clearCookie("accessToken", { path: "/" });
+    res.clearCookie("refreshToken", { path: "/" });
+    res.clearCookie("dev-accessToken", { path: "/" });
+    res.clearCookie("dev-refreshToken", { path: "/" });
+    res.clearCookie("__Secure-accessToken", { path: "/" });
+    res.clearCookie("__Secure-refreshToken", { path: "/" });
 
     return res.status(200).json({
       ok: true,
