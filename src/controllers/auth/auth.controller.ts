@@ -68,7 +68,6 @@ export async function registerUser(req: Request, res: Response) {
 export async function loginUser(req: Request, res: Response) {
   try {
     const parsed = loginSchema.safeParse(req.body);
-
     if (!parsed.success) {
       return res.status(400).json({
         ok: false,
@@ -120,8 +119,9 @@ export async function loginUser(req: Request, res: Response) {
       sameSite: "lax" as const,
       path: "/",
     };
-    res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 });
-    res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 7 });
+
+    res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 }); 
+    res.cookie("refreshToken", refreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 8 }); 
 
     return res.status(200).json({
       ok: true,
@@ -154,7 +154,7 @@ function hashToken(token: string): string {
 export async function refreshSession(req: Request, res: Response) {
   try {
     const refreshToken = req.cookies?.refreshToken;
-    console.log(refreshToken)
+
     if (!refreshToken) {
       return res.status(401).json({
         ok: false,
@@ -162,11 +162,10 @@ export async function refreshSession(req: Request, res: Response) {
       });
     }
 
-    // ✅ try/catch propio para distinguir token inválido/expirado
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
-    } catch {
+    } catch (err) {
       return res.status(401).json({
         ok: false,
         message: "Refresh token expirado o inválido",
@@ -184,7 +183,6 @@ export async function refreshSession(req: Request, res: Response) {
       });
     }
 
-    // ✅ Verificar usuario activo
     if (!user.isActive) {
       return res.status(403).json({
         ok: false,
@@ -192,7 +190,6 @@ export async function refreshSession(req: Request, res: Response) {
       });
     }
 
-    // ✅ Comparar contra el hash guardado en BD
     if (user.refreshToken !== hashToken(refreshToken)) {
       return res.status(401).json({
         ok: false,
@@ -200,16 +197,13 @@ export async function refreshSession(req: Request, res: Response) {
       });
     }
 
-    // ✅ Rotación: generar nuevos tokens
     const newAccessToken = signAccessToken(user);
     const newRefreshToken = signRefreshToken(user);
 
-    // ✅ Guardar el hash del nuevo refresh token
     await prisma.user.update({
       where: { id: user.id },
       data: { refreshToken: hashToken(newRefreshToken) },
     });
-
 
     const isProduction = process.env.NODE_ENV === "production";
     const cookieOptions = {
@@ -218,22 +212,21 @@ export async function refreshSession(req: Request, res: Response) {
       sameSite: "lax" as const,
       path: "/",
     };
-    res.cookie("accessToken", newAccessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 });
-    res.cookie("refreshToken", newRefreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 7 });
-    console.log("refresh")
+
+    res.cookie("accessToken", newAccessToken, { ...cookieOptions, maxAge: 1000 * 60 * 15 });        // 15min
+    res.cookie("refreshToken", newRefreshToken, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 8 });  // 8h
+
     return res.status(200).json({
       ok: true,
       message: "Sesión refrescada",
     });
   } catch (error) {
-    console.error("refreshSession error:", error);
     return res.status(500).json({
       ok: false,
       message: "Error interno del servidor",
     });
   }
 }
-
 
 export async function logoutUser(req: Request, res: Response) {
   try {
@@ -284,7 +277,6 @@ export async function logoutUser(req: Request, res: Response) {
 }
 
 export async function getMe(req: AuthenticatedRequest, res: Response) {
-  console.log("entre")
   const user = await prisma.user.findUnique({
     where: { id: req.user!.id },
     select: { id: true, name: true, email: true, role: true, isActive: true },

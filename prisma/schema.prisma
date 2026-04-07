@@ -61,6 +61,10 @@ model Invoice {
   documentType   DocumentType
   documentNumber String
 
+  customerCountry String? @default("Colombia")
+  customerDepartment String? @default("Norte de Santander")
+  customerCity String? @default("Villa del Rosario")
+
   subtotal Int @default(0)
   total    Int @default(0)
 
@@ -117,8 +121,6 @@ enum DocumentType {
   PASAPORTE
   TARJETA_IDENTIDAD
   DNI
-  RG
+  CARTEIRA_IDENTIDADE
   OTRO
-  RIF
-  PPT
 }

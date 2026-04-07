@@ -45,6 +45,9 @@ export type InvoiceMinAggregateOutputType = {
   customerAddress: string | null
   documentType: $Enums.DocumentType | null
   documentNumber: string | null
+  customerCountry: string | null
+  customerDepartment: string | null
+  customerCity: string | null
   subtotal: number | null
   total: number | null
   status: $Enums.InvoiceStatus | null
@@ -64,6 +67,9 @@ export type InvoiceMaxAggregateOutputType = {
   customerAddress: string | null
   documentType: $Enums.DocumentType | null
   documentNumber: string | null
+  customerCountry: string | null
+  customerDepartment: string | null
+  customerCity: string | null
   subtotal: number | null
   total: number | null
   status: $Enums.InvoiceStatus | null
@@ -83,6 +89,9 @@ export type InvoiceCountAggregateOutputType = {
   customerAddress: number
   documentType: number
   documentNumber: number
+  customerCountry: number
+  customerDepartment: number
+  customerCity: number
   subtotal: number
   total: number
   status: number
@@ -115,6 +124,9 @@ export type InvoiceMinAggregateInputType = {
   customerAddress?: true
   documentType?: true
   documentNumber?: true
+  customerCountry?: true
+  customerDepartment?: true
+  customerCity?: true
   subtotal?: true
   total?: true
   status?: true
@@ -134,6 +146,9 @@ export type InvoiceMaxAggregateInputType = {
   customerAddress?: true
   documentType?: true
   documentNumber?: true
+  customerCountry?: true
+  customerDepartment?: true
+  customerCity?: true
   subtotal?: true
   total?: true
   status?: true
@@ -153,6 +168,9 @@ export type InvoiceCountAggregateInputType = {
   customerAddress?: true
   documentType?: true
   documentNumber?: true
+  customerCountry?: true
+  customerDepartment?: true
+  customerCity?: true
   subtotal?: true
   total?: true
   status?: true
@@ -260,6 +278,9 @@ export type InvoiceGroupByOutputType = {
   customerAddress: string
   documentType: $Enums.DocumentType
   documentNumber: string
+  customerCountry: string | null
+  customerDepartment: string | null
+  customerCity: string | null
   subtotal: number
   total: number
   status: $Enums.InvoiceStatus
@@ -303,6 +324,9 @@ export type InvoiceWhereInput = {
   customerAddress?: Prisma.StringFilter<"Invoice"> | string
   documentType?: Prisma.EnumDocumentTypeFilter<"Invoice"> | $Enums.DocumentType
   documentNumber?: Prisma.StringFilter<"Invoice"> | string
+  customerCountry?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  customerDepartment?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  customerCity?: Prisma.StringNullableFilter<"Invoice"> | string | null
   subtotal?: Prisma.IntFilter<"Invoice"> | number
   total?: Prisma.IntFilter<"Invoice"> | number
   status?: Prisma.EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
@@ -324,6 +348,9 @@ export type InvoiceOrderByWithRelationInput = {
   customerAddress?: Prisma.SortOrder
   documentType?: Prisma.SortOrder
   documentNumber?: Prisma.SortOrder
+  customerCountry?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerDepartment?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerCity?: Prisma.SortOrderInput | Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -348,6 +375,9 @@ export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   customerAddress?: Prisma.StringFilter<"Invoice"> | string
   documentType?: Prisma.EnumDocumentTypeFilter<"Invoice"> | $Enums.DocumentType
   documentNumber?: Prisma.StringFilter<"Invoice"> | string
+  customerCountry?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  customerDepartment?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  customerCity?: Prisma.StringNullableFilter<"Invoice"> | string | null
   subtotal?: Prisma.IntFilter<"Invoice"> | number
   total?: Prisma.IntFilter<"Invoice"> | number
   status?: Prisma.EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
@@ -369,6 +399,9 @@ export type InvoiceOrderByWithAggregationInput = {
   customerAddress?: Prisma.SortOrder
   documentType?: Prisma.SortOrder
   documentNumber?: Prisma.SortOrder
+  customerCountry?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerDepartment?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerCity?: Prisma.SortOrderInput | Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -397,6 +430,9 @@ export type InvoiceScalarWhereWithAggregatesInput = {
   customerAddress?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
   documentType?: Prisma.EnumDocumentTypeWithAggregatesFilter<"Invoice"> | $Enums.DocumentType
   documentNumber?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
+  customerCountry?: Prisma.StringNullableWithAggregatesFilter<"Invoice"> | string | null
+  customerDepartment?: Prisma.StringNullableWithAggregatesFilter<"Invoice"> | string | null
+  customerCity?: Prisma.StringNullableWithAggregatesFilter<"Invoice"> | string | null
   subtotal?: Prisma.IntWithAggregatesFilter<"Invoice"> | number
   total?: Prisma.IntWithAggregatesFilter<"Invoice"> | number
   status?: Prisma.EnumInvoiceStatusWithAggregatesFilter<"Invoice"> | $Enums.InvoiceStatus
@@ -417,6 +453,9 @@ export type InvoiceCreateInput = {
   customerAddress: string
   documentType: $Enums.DocumentType
   documentNumber: string
+  customerCountry?: string | null
+  customerDepartment?: string | null
+  customerCity?: string | null
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -438,6 +477,9 @@ export type InvoiceUncheckedCreateInput = {
   customerAddress: string
   documentType: $Enums.DocumentType
   documentNumber: string
+  customerCountry?: string | null
+  customerDepartment?: string | null
+  customerCity?: string | null
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -459,6 +501,9 @@ export type InvoiceUpdateInput = {
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
   documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerDepartment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -480,6 +525,9 @@ export type InvoiceUncheckedUpdateInput = {
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
   documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerDepartment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -501,6 +549,9 @@ export type InvoiceCreateManyInput = {
   customerAddress: string
   documentType: $Enums.DocumentType
   documentNumber: string
+  customerCountry?: string | null
+  customerDepartment?: string | null
+  customerCity?: string | null
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -521,6 +572,9 @@ export type InvoiceUpdateManyMutationInput = {
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
   documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerDepartment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -541,6 +595,9 @@ export type InvoiceUncheckedUpdateManyInput = {
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
   documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerDepartment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -561,6 +618,9 @@ export type InvoiceCountOrderByAggregateInput = {
   customerAddress?: Prisma.SortOrder
   documentType?: Prisma.SortOrder
   documentNumber?: Prisma.SortOrder
+  customerCountry?: Prisma.SortOrder
+  customerDepartment?: Prisma.SortOrder
+  customerCity?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -586,6 +646,9 @@ export type InvoiceMaxOrderByAggregateInput = {
   customerAddress?: Prisma.SortOrder
   documentType?: Prisma.SortOrder
   documentNumber?: Prisma.SortOrder
+  customerCountry?: Prisma.SortOrder
+  customerDepartment?: Prisma.SortOrder
+  customerCity?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -605,6 +668,9 @@ export type InvoiceMinOrderByAggregateInput = {
   customerAddress?: Prisma.SortOrder
   documentType?: Prisma.SortOrder
   documentNumber?: Prisma.SortOrder
+  customerCountry?: Prisma.SortOrder
+  customerDepartment?: Prisma.SortOrder
+  customerCity?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -656,6 +722,9 @@ export type InvoiceCreateWithoutItemsInput = {
   customerAddress: string
   documentType: $Enums.DocumentType
   documentNumber: string
+  customerCountry?: string | null
+  customerDepartment?: string | null
+  customerCity?: string | null
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -676,6 +745,9 @@ export type InvoiceUncheckedCreateWithoutItemsInput = {
   customerAddress: string
   documentType: $Enums.DocumentType
   documentNumber: string
+  customerCountry?: string | null
+  customerDepartment?: string | null
+  customerCity?: string | null
   subtotal?: number
   total?: number
   status?: $Enums.InvoiceStatus
@@ -712,6 +784,9 @@ export type InvoiceUpdateWithoutItemsInput = {
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
   documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerDepartment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -732,6 +807,9 @@ export type InvoiceUncheckedUpdateWithoutItemsInput = {
   customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
   documentNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerDepartment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
@@ -783,6 +861,9 @@ export type InvoiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   customerAddress?: boolean
   documentType?: boolean
   documentNumber?: boolean
+  customerCountry?: boolean
+  customerDepartment?: boolean
+  customerCity?: boolean
   subtotal?: boolean
   total?: boolean
   status?: boolean
@@ -805,6 +886,9 @@ export type InvoiceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   customerAddress?: boolean
   documentType?: boolean
   documentNumber?: boolean
+  customerCountry?: boolean
+  customerDepartment?: boolean
+  customerCity?: boolean
   subtotal?: boolean
   total?: boolean
   status?: boolean
@@ -825,6 +909,9 @@ export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   customerAddress?: boolean
   documentType?: boolean
   documentNumber?: boolean
+  customerCountry?: boolean
+  customerDepartment?: boolean
+  customerCity?: boolean
   subtotal?: boolean
   total?: boolean
   status?: boolean
@@ -845,6 +932,9 @@ export type InvoiceSelectScalar = {
   customerAddress?: boolean
   documentType?: boolean
   documentNumber?: boolean
+  customerCountry?: boolean
+  customerDepartment?: boolean
+  customerCity?: boolean
   subtotal?: boolean
   total?: boolean
   status?: boolean
@@ -856,7 +946,7 @@ export type InvoiceSelectScalar = {
   updatedAt?: boolean
 }
 
-export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "customerName" | "customerEmail" | "customerPhone" | "customerAddress" | "documentType" | "documentNumber" | "subtotal" | "total" | "status" | "wompiTransactionId" | "wompiStatus" | "paymentMethodType" | "wompiPayload" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
+export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "customerName" | "customerEmail" | "customerPhone" | "customerAddress" | "documentType" | "documentNumber" | "customerCountry" | "customerDepartment" | "customerCity" | "subtotal" | "total" | "status" | "wompiTransactionId" | "wompiStatus" | "paymentMethodType" | "wompiPayload" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
 export type InvoiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | Prisma.Invoice$itemsArgs<ExtArgs>
   _count?: boolean | Prisma.InvoiceCountOutputTypeDefaultArgs<ExtArgs>
@@ -878,6 +968,9 @@ export type $InvoicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     customerAddress: string
     documentType: $Enums.DocumentType
     documentNumber: string
+    customerCountry: string | null
+    customerDepartment: string | null
+    customerCity: string | null
     subtotal: number
     total: number
     status: $Enums.InvoiceStatus
@@ -1319,6 +1412,9 @@ export interface InvoiceFieldRefs {
   readonly customerAddress: Prisma.FieldRef<"Invoice", 'String'>
   readonly documentType: Prisma.FieldRef<"Invoice", 'DocumentType'>
   readonly documentNumber: Prisma.FieldRef<"Invoice", 'String'>
+  readonly customerCountry: Prisma.FieldRef<"Invoice", 'String'>
+  readonly customerDepartment: Prisma.FieldRef<"Invoice", 'String'>
+  readonly customerCity: Prisma.FieldRef<"Invoice", 'String'>
   readonly subtotal: Prisma.FieldRef<"Invoice", 'Int'>
   readonly total: Prisma.FieldRef<"Invoice", 'Int'>
   readonly status: Prisma.FieldRef<"Invoice", 'InvoiceStatus'>

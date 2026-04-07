@@ -9,7 +9,6 @@ export async function runSeed() {
   });
 
   if (adminExists) {
-    console.log("Seed ya ejecutado, admin existe");
     return;
   }
 

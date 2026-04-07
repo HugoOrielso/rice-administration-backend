@@ -35,10 +35,8 @@ export const DocumentType = {
   PASAPORTE: 'PASAPORTE',
   TARJETA_IDENTIDAD: 'TARJETA_IDENTIDAD',
   DNI: 'DNI',
-  RG: 'RG',
-  OTRO: 'OTRO',
-  RIF: 'RIF',
-  PPT: 'PPT'
+  CARTEIRA_IDENTIDADE: 'CARTEIRA_IDENTIDADE',
+  OTRO: 'OTRO'
 } as const
 
 export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]

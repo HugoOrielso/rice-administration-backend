@@ -10,7 +10,7 @@ export async function wompiWebhook(req: Request, res: Response) {
   try {
     const payload = req.body as WompiWebhookPayload;
     const eventsSecret = process.env.WOMPI_EVENTS_SECRET?.trim();
-
+    console.log(payload)
     if (!eventsSecret) {
       return res.status(500).json({ error: "Webhook no configurado" });
     }

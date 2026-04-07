@@ -55,7 +55,6 @@ export function requireAuth(
       }
     }
 
-    console.error("requireAuth error:", error);
     return res.status(401).json({
       ok: false,
       message: "No autenticado",
@@ -65,10 +64,11 @@ export function requireAuth(
 
 export function requireRole(...roles: UserRole[]) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+
     if (!req.user?.role || !roles.includes(req.user.role)) {
       return res.status(403).json({
         ok: false,
-        message: "No tienes permisos para acceder a este recurso", // ✅ en español
+        message: "No tienes permisos para acceder a este recurso",
       });
     }
 

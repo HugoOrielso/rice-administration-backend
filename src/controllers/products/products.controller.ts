@@ -1,19 +1,16 @@
 // src/controllers/product.controller.ts
 import { Request, Response } from "express";
-import path from "node:path";
-import fs from "fs";
 import { prisma } from "../../database/db";
 import { ProductService } from "../../services/products/products.service";
 import { uploadBufferToCloudinary } from "../../utils/cloudinary/upload";
 import cloudinary from "../../config/cloudinary";
 
 interface MulterRequest extends Request {
-    file?: Express.Multer.File;
+    file?: any;
 }
 
 export async function createProduct(req: MulterRequest, res: Response) {
     try {
-        console.log("asdsksdajij")
         let imageUrl: string | null = null;
 
         if (req.file) {

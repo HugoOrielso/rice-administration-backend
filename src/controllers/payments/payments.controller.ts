@@ -1,74 +1,16 @@
 import { Request, Response } from "express";
-import { prisma } from "../../database/db";
-import { DocumentType, InvoiceStatus } from "../../generated/prisma/enums";
 import crypto from "crypto";
-
-interface CheckoutCustomer {
-  fullName: string;
-  documentType: DocumentType;
-  documentNumber: string;
-  address: string;
-  email: string;
-  phone: string;
-  city: string;
-}
-
-interface CheckoutItem {
-  productId: string;
-  quantity: number;
-}
-
-interface CreateWompiCheckoutBody {
-  customer: CheckoutCustomer;
-  items: CheckoutItem[];
-}
+import { DocumentType, InvoiceStatus } from "../../generated/prisma/enums";
+import { prisma } from "../../database/db";
+import { CreateWompiCheckoutInput } from "../../schemas/checkout/checkout.schema";
+import { Prisma } from "../../generated/prisma/client";
 
 export async function createWompiCheckout(
-  req: Request<unknown, unknown, CreateWompiCheckoutBody>,
+  req: Request<unknown, unknown, CreateWompiCheckoutInput>,
   res: Response
 ) {
   try {
     const { customer, items } = req.body;
-
-    if (!customer) {
-      return res.status(400).json({
-        message: "Los datos del cliente son obligatorios",
-      });
-    }
-
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({
-        message: "Debes enviar al menos un producto",
-      });
-    }
-
-    const requiredCustomerFields: (keyof CheckoutCustomer)[] = [
-      "fullName",
-      "documentType",
-      "documentNumber",
-      "address",
-      "email",
-      "phone",
-      "city",
-    ];
-
-    for (const field of requiredCustomerFields) {
-      if (!customer[field]?.toString().trim()) {
-        return res.status(400).json({
-          message: `El campo ${field} es obligatorio`,
-        });
-      }
-    }
-
-    const invalidItem = items.find(
-      (item) => !item.productId || Number(item.quantity) <= 0
-    );
-
-    if (invalidItem) {
-      return res.status(400).json({
-        message: "Hay productos inválidos en la compra",
-      });
-    }
 
     const productIds = [...new Set(items.map((item) => item.productId))];
 
@@ -95,7 +37,9 @@ export async function createWompiCheckout(
       }
 
       if (product.stock < item.quantity) {
-        throw new Error(`Stock insuficiente para ${product.name}`);
+        return {
+          error: `Stock insuficiente para ${product.name}`,
+        };
       }
 
       const unitPrice = Number(product.price);
@@ -109,7 +53,19 @@ export async function createWompiCheckout(
       };
     });
 
-    const subtotal = normalizedItems.reduce((acc, item) => acc + item.lineTotal, 0);
+    const stockError = normalizedItems.find((item) => "error" in item);
+    if (stockError && "error" in stockError) {
+      return res.status(400).json({
+        message: stockError.error,
+      });
+    }
+
+    const safeItems = normalizedItems.filter(
+      (item): item is Exclude<(typeof normalizedItems)[number], { error: string }> =>
+        !("error" in item)
+    );
+
+    const subtotal = safeItems.reduce((acc, item) => acc + item.lineTotal, 0);
     const total = subtotal;
 
     if (total <= 0) {
@@ -118,12 +74,9 @@ export async function createWompiCheckout(
       });
     }
 
-    const amountInCents = total * 100;
-    const reference = `ORDER-${Date.now()}-${crypto
-      .randomBytes(4)
-      .toString("hex")}`;
-
     const integrityKey = process.env.WOMPI_INTEGRITY_KEY;
+    const publicKey = process.env.WOMPI_PUBLIC_KEY;
+    const frontendUrl = process.env.FRONTEND_URL;
 
     if (!integrityKey) {
       return res.status(500).json({
@@ -131,11 +84,20 @@ export async function createWompiCheckout(
       });
     }
 
-    if (!process.env.WOMPI_PUBLIC_KEY) {
+    if (!publicKey) {
       return res.status(500).json({
         message: "Falta configurar WOMPI_PUBLIC_KEY",
       });
     }
+
+    if (!frontendUrl) {
+      return res.status(500).json({
+        message: "Falta configurar FRONTEND_URL",
+      });
+    }
+
+    const amountInCents = total * 100;
+    const reference = `ORDER-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
 
     const signature = crypto
       .createHash("sha256")
@@ -149,13 +111,20 @@ export async function createWompiCheckout(
         customerEmail: customer.email,
         customerPhone: customer.phone,
         customerAddress: customer.address,
+
+        // usa los nombres REALES de tu modelo Prisma
+        customerCity: customer.city,
+        customerDepartment: customer.department,
+        customerCountry: customer.country,
+
         documentType: customer.documentType as DocumentType,
         documentNumber: customer.documentNumber,
         subtotal,
         total,
         status: InvoiceStatus.PENDING,
+
         items: {
-          create: normalizedItems.map((item) => ({
+          create: safeItems.map((item) => ({
             productId: item.product.id,
             productName: item.product.name,
             quantity: item.quantity,
@@ -163,7 +132,10 @@ export async function createWompiCheckout(
             lineTotal: item.lineTotal,
             packageLabel: item.product.packageLabel,
             unitsPerPackage: item.product.unitsPerPackage,
-            unitWeightGrams: item.product.unitWeightGrams,
+            unitWeightGrams:
+              item.product.unitWeightGrams != null
+                ? new Prisma.Decimal(item.product.unitWeightGrams)
+                : null,
           })),
         },
       },
@@ -179,13 +151,15 @@ export async function createWompiCheckout(
         reference,
         amountInCents,
         currency: "COP",
-        publicKey: process.env.WOMPI_PUBLIC_KEY,
+        publicKey,
         customerEmail: customer.email,
-        redirectUrl: `${process.env.FRONTEND_URL}/checkout/resultado?reference=${reference}`,
         signature,
+        redirectUrl: `${frontendUrl}/checkout/resultado?reference=${reference}`,
       },
     });
   } catch (error) {
+    console.error("Error creando checkout de Wompi:", error);
+
     return res.status(500).json({
       message:
         error instanceof Error
