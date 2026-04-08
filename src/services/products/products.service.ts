@@ -1,9 +1,8 @@
 import { prisma } from "../../database/db";
-import { Prisma } from "../../generated/prisma/client";
 import {
   CreateProductInput,
-  UpdateProductInput,
 } from "../../schemas/products/products.schema";
+import { UpdateProductInput } from "../../types/product";
 
 type CreateProductWithImageInput = CreateProductInput & {
   imageUrl?: string | null;
@@ -33,7 +32,7 @@ export class ProductService {
 
   static async findAll() {
     return prisma.product.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "asc" },
     });
   }
 
