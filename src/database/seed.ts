@@ -8,13 +8,13 @@ export async function runSeed() {
     {
       name: "Administrador",
       email: "admin@arrozzulia.com",
-      password: "&4kBa$gMyPSFVbCJf3yP!H",
+      password: "Andina2026@.",
       role: "ADMIN",
     },
     {
       name: "Auxiliar",
       email: "auxiliar@arrozzulia.com",
-      password: "f#FLKGtEe2595ZDi6D6RM%",
+      password: "@Capitalsas2026.",
       role: "OPERATOR",
     },
   ];
