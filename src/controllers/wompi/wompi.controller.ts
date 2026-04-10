@@ -14,6 +14,8 @@ export async function wompiWebhook(req: Request, res: Response) {
       return res.status(500).json({ error: "Webhook no configurado" });
     }
 
+    const checksum = req.header
+
     // 🔐 Validar firma
     const isValid = validateWompiWebhook(payload, eventsSecret);
 

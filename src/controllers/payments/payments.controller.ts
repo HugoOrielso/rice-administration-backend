@@ -4,6 +4,19 @@ import { DocumentType, InvoiceStatus } from "../../generated/prisma/enums";
 import { prisma } from "../../database/db";
 import { CreateWompiCheckoutInput } from "../../schemas/checkout/checkout.schema";
 import { Prisma } from "../../generated/prisma/client";
+const wompiLegalIdTypeMap: Record<string, string> = {
+  REGISTRO_CIVIL: "RC",
+  TARJETA_EXTRANJERIA: "TE",
+  CEDULA_CIUDADANIA: "CC",
+  CEDULA_EXTRANJERIA: "CE",
+  NIT: "NIT",
+  PASAPORTE: "PP",
+  TARJETA_IDENTIDAD: "TI",
+  DNI: "CC",
+  CARTEIRA_IDENTIDADE: "CC",
+  OTRO: "CC",
+};
+
 
 export async function createWompiCheckout(
   req: Request<unknown, unknown, CreateWompiCheckoutInput>,
@@ -42,7 +55,7 @@ export async function createWompiCheckout(
         };
       }
 
-      const unitPrice = Number(product.price);
+      const unitPrice = 2000;
       const lineTotal = unitPrice * item.quantity;
 
       return {
@@ -74,19 +87,12 @@ export async function createWompiCheckout(
       });
     }
 
-    const integrityKey = process.env.WOMPI_INTEGRITY_KEY;
-    const publicKey = process.env.WOMPI_PUBLIC_KEY;
+    const privateKey = process.env.WOMPI_PRIVATE_KEY;
     const frontendUrl = process.env.FRONTEND_URL;
 
-    if (!integrityKey) {
+    if (!privateKey) {
       return res.status(500).json({
-        message: "Falta configurar WOMPI_INTEGRITY_KEY",
-      });
-    }
-
-    if (!publicKey) {
-      return res.status(500).json({
-        message: "Falta configurar WOMPI_PUBLIC_KEY",
+        message: "Falta configurar WOMPI_PRIVATE_KEY",
       });
     }
 
@@ -96,15 +102,10 @@ export async function createWompiCheckout(
       });
     }
 
-    const amountInCents = total * 100;
+    const amountInCents = Math.round(total * 100);
     const reference = `ORDER-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
 
-
-    const signature = crypto
-      .createHash("sha256")
-      .update(`${reference}${amountInCents}COP${integrityKey}`)
-      .digest("hex");
-
+    // Crear factura primero
     const invoice = await prisma.invoice.create({
       data: {
         invoiceNumber: reference,
@@ -112,18 +113,14 @@ export async function createWompiCheckout(
         customerEmail: customer.email,
         customerPhone: customer.phone,
         customerAddress: customer.address,
-
-        // usa los nombres REALES de tu modelo Prisma
         customerCity: customer.city,
         customerDepartment: customer.department,
         customerCountry: customer.country,
-
         documentType: customer.documentType as DocumentType,
         documentNumber: customer.documentNumber,
         subtotal,
         total,
         status: InvoiceStatus.PENDING,
-
         items: {
           create: safeItems.map((item) => ({
             productId: item.product.id,
@@ -145,17 +142,49 @@ export async function createWompiCheckout(
       },
     });
 
+    // Crear link de pago dinámico en Wompi
+    const wompiResponse = await fetch("https://production.wompi.co/v1/payment_links", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${privateKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: `Pedido ${reference}`,
+        description: safeItems.map((i) => `${i.product.name} x${i.quantity}`).join(", "),
+        single_use: true,
+        collect_shipping: false,
+        currency: "COP",
+        amount_in_cents: amountInCents,
+        redirect_url: `${frontendUrl}/checkout/resultado?reference=${reference}`,
+        reference,
+        image_url: safeItems[0]?.product.imageUrl ?? null,
+        customer_data: {
+          email: customer.email,
+          full_name: customer.fullName,
+          phone_number: customer.phone,
+          legal_id: customer.documentNumber,
+          legal_id_type: wompiLegalIdTypeMap[customer.documentType] ?? "CC",
+        },
+      }),
+    });
+
+    const wompiData = await wompiResponse.json();
+
+    if (!wompiResponse.ok) {
+      console.error("❌ Wompi error:", JSON.stringify(wompiData, null, 2));
+      return res.status(500).json({
+        message: "Error creando link de pago en Wompi",
+      });
+    }
+
+
     return res.status(200).json({
       ok: true,
       data: {
         invoiceId: invoice.id,
         reference,
-        amountInCents,
-        currency: "COP",
-        publicKey,
-        customerEmail: customer.email,
-        signature,
-        redirectUrl: `${frontendUrl}/checkout/resultado?reference=${reference}`,
+        paymentUrl: `https://checkout.wompi.co/l/${wompiData.data.id}`,
       },
     });
   } catch (error) {

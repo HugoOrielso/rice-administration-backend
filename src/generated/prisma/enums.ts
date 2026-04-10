@@ -20,7 +20,12 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 export const InvoiceStatus = {
   PENDING: 'PENDING',
   PAID: 'PAID',
-  CANCELLED: 'CANCELLED'
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED',
+  EXPIRED: 'EXPIRED',
+  DECLINED: 'DECLINED',
+  APPROVED: 'APPROVED',
+  ERROR: 'ERROR'
 } as const
 
 export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus]

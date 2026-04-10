@@ -784,6 +784,7 @@ export const InvoiceScalarFieldEnum = {
   customerEmail: 'customerEmail',
   customerPhone: 'customerPhone',
   customerAddress: 'customerAddress',
+  customerPhonePrefix: 'customerPhonePrefix',
   documentType: 'documentType',
   documentNumber: 'documentNumber',
   customerCountry: 'customerCountry',

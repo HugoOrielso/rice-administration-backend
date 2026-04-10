@@ -57,7 +57,7 @@ model Invoice {
   customerEmail   String
   customerPhone   String
   customerAddress String
-
+  customerPhonePrefix String @default("+57")
   documentType   DocumentType
   documentNumber String
 
@@ -110,6 +110,11 @@ enum InvoiceStatus {
   PENDING
   PAID
   CANCELLED
+  REFUNDED
+  EXPIRED
+  DECLINED
+  APPROVED
+  ERROR
 }
 
 enum DocumentType {

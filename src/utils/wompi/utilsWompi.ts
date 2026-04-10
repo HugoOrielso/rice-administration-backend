@@ -49,9 +49,16 @@ export function mapWompiStatusToInvoiceStatus(status?: string): InvoiceStatus {
       return InvoiceStatus.PAID;
 
     case "DECLINED":
+      return InvoiceStatus.DECLINED;
+
     case "ERROR":
+      return InvoiceStatus.ERROR;
+
     case "VOIDED":
-      return InvoiceStatus.CANCELLED;
+      return InvoiceStatus.REFUNDED;
+
+    case "EXPIRED":
+      return InvoiceStatus.EXPIRED;
 
     case "PENDING":
     default:
