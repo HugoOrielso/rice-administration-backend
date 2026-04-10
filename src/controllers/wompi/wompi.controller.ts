@@ -28,8 +28,6 @@ export async function wompiWebhook(req: Request, res: Response) {
       return res.status(200).json({ ok: true, ignored: true });
     }
 
-
-
     const transaction = payload.data?.transaction;
 
     if (!transaction) {
@@ -163,7 +161,7 @@ export async function wompiWebhook(req: Request, res: Response) {
 
       await tx.invoice.create({
         data: {
-          invoiceNumber: reference ?? '',
+          invoiceNumber: orderReference ?? '',
           customerName: order.customerName,
           customerEmail: order.customerEmail,
           customerPhone: order.customerPhone,
