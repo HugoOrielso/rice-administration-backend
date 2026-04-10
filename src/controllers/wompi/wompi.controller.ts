@@ -103,22 +103,9 @@ export async function wompiWebhook(req: Request, res: Response) {
     const nextOrderStatus = mapOrderStatus(wompiStatus);
 
     await prisma.$transaction(async (tx) => {
-      const invoiceNumber = orderReference ?? reference;
+      const invoiceNumber = orderReference ?? reference ?? '';
 
-      // 1. verificar por transactionId
-      const existingByTx = await tx.invoice.findFirst({
-        where: { wompiTransactionId },
-      });
-
-      if (existingByTx) return;
-
-      // 2. verificar por invoiceNumber
-      const existingByNumber = await tx.invoice.findUnique({
-        where: { invoiceNumber },
-      });
-
-      if (existingByNumber) return;
-      // Si no está aprobado, solo actualizamos la orden
+      // 1) Si no está pagado, solo sincroniza estado de la orden
       if (nextInvoiceStatus !== InvoiceStatus.PAID) {
         await tx.order.update({
           where: { id: order.id },
@@ -134,8 +121,15 @@ export async function wompiWebhook(req: Request, res: Response) {
         return;
       }
 
-      // Si ya existe factura, ya fue procesado antes
-      if (existingInvoice) {
+      // 2) Idempotencia por transactionId
+      const existingInvoiceByTransaction =
+        wompiTransactionId
+          ? await tx.invoice.findFirst({
+            where: { wompiTransactionId },
+          })
+          : null;
+
+      if (existingInvoiceByTransaction) {
         await tx.order.update({
           where: { id: order.id },
           data: {
@@ -151,7 +145,28 @@ export async function wompiWebhook(req: Request, res: Response) {
         return;
       }
 
-      // Validar stock antes de crear factura y descontar
+      // 3) Idempotencia por invoiceNumber
+      const existingInvoiceByNumber = await tx.invoice.findUnique({
+        where: { invoiceNumber },
+      });
+
+      if (existingInvoiceByNumber) {
+        await tx.order.update({
+          where: { id: order.id },
+          data: {
+            status: OrderStatus.PAID,
+            wompiStatus,
+            wompiTransactionId,
+            paymentMethodType: transaction.payment_method_type ?? null,
+            wompiPayload: payload as unknown as Prisma.InputJsonValue,
+            processedAt: order.processedAt ?? new Date(),
+          },
+        });
+
+        return;
+      }
+
+      // 4) Validar stock antes de crear factura
       for (const item of order.items) {
         if (!item.productId) {
           throw new Error(`El item ${item.id} no tiene productId`);
@@ -170,9 +185,10 @@ export async function wompiWebhook(req: Request, res: Response) {
         }
       }
 
+      // 5) Crear factura
       await tx.invoice.create({
         data: {
-          invoiceNumber: orderReference ?? '',
+          invoiceNumber,
           customerName: order.customerName,
           customerEmail: order.customerEmail,
           customerPhone: order.customerPhone,
@@ -206,6 +222,7 @@ export async function wompiWebhook(req: Request, res: Response) {
         },
       });
 
+      // 6) Descontar stock
       for (const item of order.items) {
         if (!item.productId) continue;
 
@@ -219,6 +236,7 @@ export async function wompiWebhook(req: Request, res: Response) {
         });
       }
 
+      // 7) Marcar orden como pagada
       await tx.order.update({
         where: { id: order.id },
         data: {
@@ -227,7 +245,7 @@ export async function wompiWebhook(req: Request, res: Response) {
           wompiTransactionId,
           paymentMethodType: transaction.payment_method_type ?? null,
           wompiPayload: payload as unknown as Prisma.InputJsonValue,
-          processedAt: new Date(),
+          processedAt: order.processedAt ?? new Date(),
         },
       });
     });
