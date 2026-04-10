@@ -78,6 +78,9 @@ export async function createWompiCheckout(
     const publicKey = process.env.WOMPI_PUBLIC_KEY;
     const frontendUrl = process.env.FRONTEND_URL;
 
+    console.log("🔑 publicKey length:", publicKey?.length);
+    console.log("🔑 publicKey JSON:", JSON.stringify(publicKey));
+
     if (!integrityKey) {
       return res.status(500).json({
         message: "Falta configurar WOMPI_INTEGRITY_KEY",
