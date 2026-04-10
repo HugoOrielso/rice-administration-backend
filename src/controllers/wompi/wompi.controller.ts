@@ -103,10 +103,11 @@ export async function wompiWebhook(req: Request, res: Response) {
     const nextOrderStatus = mapOrderStatus(wompiStatus);
 
     await prisma.$transaction(async (tx) => {
-      const existingInvoice = await tx.invoice.findUnique({
-        where: { invoiceNumber: reference },
-      });
+      const invoiceNumber = orderReference ?? reference;
 
+      const existingInvoice = await tx.invoice.findUnique({
+        where: { invoiceNumber },
+      });
       // Si no está aprobado, solo actualizamos la orden
       if (nextInvoiceStatus !== InvoiceStatus.PAID) {
         await tx.order.update({
