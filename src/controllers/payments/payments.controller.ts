@@ -55,7 +55,7 @@ export async function createWompiCheckout(
         };
       }
 
-      const unitPrice = 2000;
+      const unitPrice = Number(product.price);
       const lineTotal = unitPrice * item.quantity;
 
       return {
