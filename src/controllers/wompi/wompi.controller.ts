@@ -14,7 +14,7 @@ export async function wompiWebhook(req: Request, res: Response) {
       return res.status(500).json({ error: "Webhook no configurado" });
     }
 
-    const checksum = req.header
+    console.log(payload)
 
     // 🔐 Validar firma
     const isValid = validateWompiWebhook(payload, eventsSecret);
@@ -41,8 +41,16 @@ export async function wompiWebhook(req: Request, res: Response) {
     const nextStatus = mapWompiStatusToInvoiceStatus(wompiStatus);
 
     // 🔎 Buscar factura
-    const invoice = await prisma.invoice.findUnique({
-      where: { invoiceNumber: reference },
+    const paymentLinkId = transaction.payment_link_id ?? null;
+
+    // Buscar por reference primero, si no por payment_link_id
+    const invoice = await prisma.invoice.findFirst({
+      where: {
+        OR: [
+          { invoiceNumber: reference },
+          { wompiPaymentLinkId: paymentLinkId ?? "" },
+        ],
+      },
       include: { items: true },
     });
 

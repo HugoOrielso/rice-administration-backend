@@ -158,6 +158,7 @@ export async function createWompiCheckout(
         amount_in_cents: amountInCents,
         redirect_url: `${frontendUrl}/checkout/resultado?reference=${reference}`,
         reference,
+        invoiceId: invoice.id ?? '',
         image_url: safeItems[0]?.product.imageUrl ?? null,
         customer_data: {
           email: customer.email,
@@ -170,6 +171,12 @@ export async function createWompiCheckout(
     });
 
     const wompiData = await wompiResponse.json();
+    const paymentLinkId = wompiData.data.id; 
+
+    await prisma.invoice.update({
+      where: { id: invoice.id },
+      data: { wompiPaymentLinkId: paymentLinkId },
+    });
 
     if (!wompiResponse.ok) {
       console.error("❌ Wompi error:", JSON.stringify(wompiData, null, 2));

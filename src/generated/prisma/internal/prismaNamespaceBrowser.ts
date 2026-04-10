@@ -129,7 +129,8 @@ export const InvoiceScalarFieldEnum = {
   paymentMethodType: 'paymentMethodType',
   wompiPayload: 'wompiPayload',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  wompiPaymentLinkId: 'wompiPaymentLinkId'
 } as const
 
 export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]

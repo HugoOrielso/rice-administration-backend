@@ -57,6 +57,7 @@ export type InvoiceMinAggregateOutputType = {
   paymentMethodType: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  wompiPaymentLinkId: string | null
 }
 
 export type InvoiceMaxAggregateOutputType = {
@@ -80,6 +81,7 @@ export type InvoiceMaxAggregateOutputType = {
   paymentMethodType: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  wompiPaymentLinkId: string | null
 }
 
 export type InvoiceCountAggregateOutputType = {
@@ -104,6 +106,7 @@ export type InvoiceCountAggregateOutputType = {
   wompiPayload: number
   createdAt: number
   updatedAt: number
+  wompiPaymentLinkId: number
   _all: number
 }
 
@@ -139,6 +142,7 @@ export type InvoiceMinAggregateInputType = {
   paymentMethodType?: true
   createdAt?: true
   updatedAt?: true
+  wompiPaymentLinkId?: true
 }
 
 export type InvoiceMaxAggregateInputType = {
@@ -162,6 +166,7 @@ export type InvoiceMaxAggregateInputType = {
   paymentMethodType?: true
   createdAt?: true
   updatedAt?: true
+  wompiPaymentLinkId?: true
 }
 
 export type InvoiceCountAggregateInputType = {
@@ -186,6 +191,7 @@ export type InvoiceCountAggregateInputType = {
   wompiPayload?: true
   createdAt?: true
   updatedAt?: true
+  wompiPaymentLinkId?: true
   _all?: true
 }
 
@@ -297,6 +303,7 @@ export type InvoiceGroupByOutputType = {
   wompiPayload: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
+  wompiPaymentLinkId: string | null
   _count: InvoiceCountAggregateOutputType | null
   _avg: InvoiceAvgAggregateOutputType | null
   _sum: InvoiceSumAggregateOutputType | null
@@ -344,6 +351,7 @@ export type InvoiceWhereInput = {
   wompiPayload?: Prisma.JsonNullableFilter<"Invoice">
   createdAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
+  wompiPaymentLinkId?: Prisma.StringNullableFilter<"Invoice"> | string | null
   items?: Prisma.InvoiceItemListRelationFilter
 }
 
@@ -369,6 +377,7 @@ export type InvoiceOrderByWithRelationInput = {
   wompiPayload?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  wompiPaymentLinkId?: Prisma.SortOrderInput | Prisma.SortOrder
   items?: Prisma.InvoiceItemOrderByRelationAggregateInput
 }
 
@@ -397,6 +406,7 @@ export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   wompiPayload?: Prisma.JsonNullableFilter<"Invoice">
   createdAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
+  wompiPaymentLinkId?: Prisma.StringNullableFilter<"Invoice"> | string | null
   items?: Prisma.InvoiceItemListRelationFilter
 }, "id" | "invoiceNumber">
 
@@ -422,6 +432,7 @@ export type InvoiceOrderByWithAggregationInput = {
   wompiPayload?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  wompiPaymentLinkId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InvoiceCountOrderByAggregateInput
   _avg?: Prisma.InvoiceAvgOrderByAggregateInput
   _max?: Prisma.InvoiceMaxOrderByAggregateInput
@@ -454,6 +465,7 @@ export type InvoiceScalarWhereWithAggregatesInput = {
   wompiPayload?: Prisma.JsonNullableWithAggregatesFilter<"Invoice">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Invoice"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Invoice"> | Date | string
+  wompiPaymentLinkId?: Prisma.StringNullableWithAggregatesFilter<"Invoice"> | string | null
 }
 
 export type InvoiceCreateInput = {
@@ -478,6 +490,7 @@ export type InvoiceCreateInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  wompiPaymentLinkId?: string | null
   items?: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput
 }
 
@@ -503,6 +516,7 @@ export type InvoiceUncheckedCreateInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  wompiPaymentLinkId?: string | null
   items?: Prisma.InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
 }
 
@@ -528,6 +542,7 @@ export type InvoiceUpdateInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wompiPaymentLinkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   items?: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput
 }
 
@@ -553,6 +568,7 @@ export type InvoiceUncheckedUpdateInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wompiPaymentLinkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   items?: Prisma.InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
 }
 
@@ -578,6 +594,7 @@ export type InvoiceCreateManyInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  wompiPaymentLinkId?: string | null
 }
 
 export type InvoiceUpdateManyMutationInput = {
@@ -602,6 +619,7 @@ export type InvoiceUpdateManyMutationInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wompiPaymentLinkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InvoiceUncheckedUpdateManyInput = {
@@ -626,6 +644,7 @@ export type InvoiceUncheckedUpdateManyInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wompiPaymentLinkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InvoiceCountOrderByAggregateInput = {
@@ -650,6 +669,7 @@ export type InvoiceCountOrderByAggregateInput = {
   wompiPayload?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  wompiPaymentLinkId?: Prisma.SortOrder
 }
 
 export type InvoiceAvgOrderByAggregateInput = {
@@ -678,6 +698,7 @@ export type InvoiceMaxOrderByAggregateInput = {
   paymentMethodType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  wompiPaymentLinkId?: Prisma.SortOrder
 }
 
 export type InvoiceMinOrderByAggregateInput = {
@@ -701,6 +722,7 @@ export type InvoiceMinOrderByAggregateInput = {
   paymentMethodType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  wompiPaymentLinkId?: Prisma.SortOrder
 }
 
 export type InvoiceSumOrderByAggregateInput = {
@@ -757,6 +779,7 @@ export type InvoiceCreateWithoutItemsInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  wompiPaymentLinkId?: string | null
 }
 
 export type InvoiceUncheckedCreateWithoutItemsInput = {
@@ -781,6 +804,7 @@ export type InvoiceUncheckedCreateWithoutItemsInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  wompiPaymentLinkId?: string | null
 }
 
 export type InvoiceCreateOrConnectWithoutItemsInput = {
@@ -821,6 +845,7 @@ export type InvoiceUpdateWithoutItemsInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wompiPaymentLinkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InvoiceUncheckedUpdateWithoutItemsInput = {
@@ -845,6 +870,7 @@ export type InvoiceUncheckedUpdateWithoutItemsInput = {
   wompiPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wompiPaymentLinkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -900,6 +926,7 @@ export type InvoiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   wompiPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  wompiPaymentLinkId?: boolean
   items?: boolean | Prisma.Invoice$itemsArgs<ExtArgs>
   _count?: boolean | Prisma.InvoiceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["invoice"]>
@@ -926,6 +953,7 @@ export type InvoiceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   wompiPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  wompiPaymentLinkId?: boolean
 }, ExtArgs["result"]["invoice"]>
 
 export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -950,6 +978,7 @@ export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   wompiPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  wompiPaymentLinkId?: boolean
 }, ExtArgs["result"]["invoice"]>
 
 export type InvoiceSelectScalar = {
@@ -974,9 +1003,10 @@ export type InvoiceSelectScalar = {
   wompiPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  wompiPaymentLinkId?: boolean
 }
 
-export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "customerName" | "customerEmail" | "customerPhone" | "customerAddress" | "customerPhonePrefix" | "documentType" | "documentNumber" | "customerCountry" | "customerDepartment" | "customerCity" | "subtotal" | "total" | "status" | "wompiTransactionId" | "wompiStatus" | "paymentMethodType" | "wompiPayload" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
+export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "customerName" | "customerEmail" | "customerPhone" | "customerAddress" | "customerPhonePrefix" | "documentType" | "documentNumber" | "customerCountry" | "customerDepartment" | "customerCity" | "subtotal" | "total" | "status" | "wompiTransactionId" | "wompiStatus" | "paymentMethodType" | "wompiPayload" | "createdAt" | "updatedAt" | "wompiPaymentLinkId", ExtArgs["result"]["invoice"]>
 export type InvoiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | Prisma.Invoice$itemsArgs<ExtArgs>
   _count?: boolean | Prisma.InvoiceCountOutputTypeDefaultArgs<ExtArgs>
@@ -1011,6 +1041,7 @@ export type $InvoicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     wompiPayload: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
+    wompiPaymentLinkId: string | null
   }, ExtArgs["result"]["invoice"]>
   composites: {}
 }
@@ -1456,6 +1487,7 @@ export interface InvoiceFieldRefs {
   readonly wompiPayload: Prisma.FieldRef<"Invoice", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Invoice", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Invoice", 'DateTime'>
+  readonly wompiPaymentLinkId: Prisma.FieldRef<"Invoice", 'String'>
 }
     
 
