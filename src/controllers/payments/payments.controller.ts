@@ -161,6 +161,7 @@ export async function createWompiCheckout(
         collect_shipping: false,
         currency: "COP",
         amount_in_cents: amountInCents,
+        redirect_url: `${frontendUrl}/payments/${reference}`,
         reference,
         image_url: null,
         customer_data: {
