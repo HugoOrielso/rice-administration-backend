@@ -163,7 +163,7 @@ export async function createWompiCheckout(
         amount_in_cents: amountInCents,
         redirect_url: `${frontendUrl}/checkout/resultado?reference=${reference}`,
         reference,
-        image_url: safeItems[0]?.product.imageUrl ?? null,
+        image_url: null,
         customer_data: {
           email: customer.email,
           full_name: customer.fullName,
