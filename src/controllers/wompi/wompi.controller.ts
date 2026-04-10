@@ -46,9 +46,13 @@ export async function wompiWebhook(req: Request, res: Response) {
     if (transaction.redirect_url) {
       try {
         const url = new URL(transaction.redirect_url);
-        const refFromUrl = url.searchParams.get("reference");
-        if (refFromUrl) {
-          orderReference = refFromUrl;
+
+        // Ejemplo: /payments/ORDER-1775809398904-28adbbaa
+        const pathSegments = url.pathname.split("/").filter(Boolean);
+        const refFromPath = pathSegments[pathSegments.length - 1] ?? null;
+
+        if (refFromPath) {
+          orderReference = decodeURIComponent(refFromPath);
         }
       } catch (error) {
         console.warn("⚠️ No se pudo parsear redirect_url:", error);
@@ -101,9 +105,9 @@ export async function wompiWebhook(req: Request, res: Response) {
     };
 
     const nextOrderStatus = mapOrderStatus(wompiStatus);
+    const invoiceNumber = orderReference ?? reference;
 
     await prisma.$transaction(async (tx) => {
-      const invoiceNumber = orderReference ?? reference ?? '';
 
       // 1) Si no está pagado, solo sincroniza estado de la orden
       if (nextInvoiceStatus !== InvoiceStatus.PAID) {
@@ -188,7 +192,7 @@ export async function wompiWebhook(req: Request, res: Response) {
       // 5) Crear factura
       await tx.invoice.create({
         data: {
-          invoiceNumber,
+          invoiceNumber: invoiceNumber ?? '',
           customerName: order.customerName,
           customerEmail: order.customerEmail,
           customerPhone: order.customerPhone,
