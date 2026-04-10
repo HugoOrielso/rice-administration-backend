@@ -16,7 +16,7 @@ export async function wompiWebhook(req: Request, res: Response) {
     if (!eventsSecret) {
       return res.status(500).json({ error: "Webhook no configurado" });
     }
-
+    console.log(payload)
     const isValid = validateWompiWebhook(payload, eventsSecret);
 
     if (!isValid) {
@@ -28,25 +28,60 @@ export async function wompiWebhook(req: Request, res: Response) {
       return res.status(200).json({ ok: true, ignored: true });
     }
 
+
+
     const transaction = payload.data?.transaction;
 
-    if (!transaction?.reference) {
-      return res.status(400).json({ error: "Reference no encontrada" });
+    if (!transaction) {
+      return res.status(400).json({ error: "Transaction no encontrada" });
     }
-
     const reference = transaction.reference;
     const wompiTransactionId = transaction.id ?? null;
     const wompiStatus = transaction.status ?? "PENDING";
     const nextInvoiceStatus = mapWompiStatusToInvoiceStatus(wompiStatus);
+    const paymentLinkId = transaction.payment_link_id ?? null;
+    const wompiReference = transaction.reference ?? null;
 
-    const order = await prisma.order.findUnique({
-      where: { reference },
+    // Extraer ORDER-... del redirect_url como fallback real
+    let orderReference: string | null = null;
+
+    if (transaction.redirect_url) {
+      try {
+        const url = new URL(transaction.redirect_url);
+        const refFromUrl = url.searchParams.get("reference");
+        if (refFromUrl) {
+          orderReference = refFromUrl;
+        }
+      } catch (error) {
+        console.warn("⚠️ No se pudo parsear redirect_url:", error);
+      }
+    }
+
+    console.log("📋 wompiReference:", wompiReference);
+    console.log("📋 paymentLinkId:", paymentLinkId);
+    console.log("📋 orderReference:", orderReference);
+
+    const order = await prisma.order.findFirst({
+      where: {
+        OR: [
+          ...(paymentLinkId ? [{ wompiPaymentLinkId: paymentLinkId }] : []),
+          ...(orderReference ? [{ reference: orderReference }] : []),
+        ],
+      },
       include: { items: true },
     });
 
     if (!order) {
-      console.warn(`⚠️ Order no encontrada: ${reference}`);
-      return res.status(200).json({ ok: true, warning: "order_not_found" });
+      console.warn("⚠️ Order no encontrada", {
+        wompiReference,
+        paymentLinkId,
+        orderReference,
+      });
+
+      return res.status(200).json({
+        ok: true,
+        warning: "order_not_found",
+      });
     }
 
     const mapOrderStatus = (status: string): OrderStatus => {
@@ -128,7 +163,7 @@ export async function wompiWebhook(req: Request, res: Response) {
 
       await tx.invoice.create({
         data: {
-          invoiceNumber: reference,
+          invoiceNumber: reference ?? '',
           customerName: order.customerName,
           customerEmail: order.customerEmail,
           customerPhone: order.customerPhone,
