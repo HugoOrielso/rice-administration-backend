@@ -78,9 +78,6 @@ export async function createWompiCheckout(
     const publicKey = process.env.WOMPI_PUBLIC_KEY;
     const frontendUrl = process.env.FRONTEND_URL;
 
-    console.log("🔑 publicKey length:", publicKey?.length);
-    console.log("🔑 publicKey JSON:", JSON.stringify(publicKey));
-
     if (!integrityKey) {
       return res.status(500).json({
         message: "Falta configurar WOMPI_INTEGRITY_KEY",
@@ -102,23 +99,11 @@ export async function createWompiCheckout(
     const amountInCents = total * 100;
     const reference = `ORDER-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
 
-    // ✅ Log 1: ver los valores exactos antes de generar la firma
-    console.log("🔑 integrityKey:", integrityKey);
-    console.log("📝 reference:", reference);
-    console.log("💰 amountInCents:", amountInCents);
-    console.log("🧮 string a hashear:", `${reference}${amountInCents}COP${integrityKey}`);
 
     const signature = crypto
       .createHash("sha256")
       .update(`${reference}${amountInCents}COP${integrityKey}`)
       .digest("hex");
-
-    console.log("✍️ signature generada:", signature);
-
-    // ✅ Log 2: ver el total antes de multiplicar
-    console.log("💵 subtotal:", subtotal);
-    console.log("💵 total:", total);
-    console.log("💵 amountInCents:", amountInCents);
 
     const invoice = await prisma.invoice.create({
       data: {
