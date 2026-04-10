@@ -161,6 +161,7 @@ export async function createWompiCheckout(
         invoiceId: invoice.id ?? '',
         image_url: safeItems[0]?.product.imageUrl ?? null,
         customer_data: {
+          invoiceId: invoice.id,
           email: customer.email,
           full_name: customer.fullName,
           phone_number: customer.phone,
@@ -171,13 +172,8 @@ export async function createWompiCheckout(
     });
 
     const wompiData = await wompiResponse.json();
-    const paymentLinkId = wompiData.data.id; 
 
-    await prisma.invoice.update({
-      where: { id: invoice.id },
-      data: { wompiPaymentLinkId: paymentLinkId },
-    });
-
+    // ✅ Validar ANTES de usar los datos
     if (!wompiResponse.ok) {
       console.error("❌ Wompi error:", JSON.stringify(wompiData, null, 2));
       return res.status(500).json({
@@ -185,6 +181,14 @@ export async function createWompiCheckout(
       });
     }
 
+    const paymentLinkId = wompiData.data.id; // "LvAFSd"
+    const paymentUrl = `https://checkout.wompi.co/l/${paymentLinkId}`;
+
+    // ✅ Guardar solo el ID, no la URL completa
+    await prisma.invoice.update({
+      where: { id: invoice.id },
+      data: { wompiPaymentLinkId: paymentLinkId },
+    });
 
     return res.status(200).json({
       ok: true,

@@ -66,9 +66,9 @@ export async function wompiWebhook(req: Request, res: Response) {
 
     // 🚀 Transacción atómica
     await prisma.$transaction(async (tx) => {
-      // 1. Actualizar factura
-      const updatedInvoice = await tx.invoice.update({
-        where: { invoiceNumber: reference },
+      // ✅ Actualizar por id de la factura encontrada, no por reference de Wompi
+      await tx.invoice.update({
+        where: { id: invoice.id },
         data: {
           status: nextStatus,
           wompiStatus,
@@ -92,23 +92,16 @@ export async function wompiWebhook(req: Request, res: Response) {
           }
 
           if (product.stock < item.quantity) {
-            throw new Error(
-              `Stock insuficiente para producto ${item.productId}`
-            );
+            throw new Error(`Stock insuficiente para producto ${item.productId}`);
           }
 
           await tx.product.update({
             where: { id: item.productId },
-            data: {
-              stock: {
-                decrement: item.quantity,
-              },
-            },
+            data: { stock: { decrement: item.quantity } },
           });
         }
       }
     });
-
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("❌ Error en webhook de Wompi:", error);
