@@ -1,21 +1,22 @@
 import { Request, Response } from "express";
-import { InvoiceStatus } from "../../generated/prisma/enums";
-import { prisma } from "../../database/db";
 import { Prisma } from "../../generated/prisma/client";
+import { InvoiceStatus, OrderStatus } from "../../generated/prisma/enums";
+import { prisma } from "../../database/db";
 import { WompiWebhookPayload } from "../../types/wompi";
-import { mapWompiStatusToInvoiceStatus, validateWompiWebhook } from "../../utils/wompi/utilsWompi";
-
+import {
+  mapWompiStatusToInvoiceStatus,
+  validateWompiWebhook,
+} from "../../utils/wompi/utilsWompi";
 
 export async function wompiWebhook(req: Request, res: Response) {
   try {
     const payload = req.body as WompiWebhookPayload;
     const eventsSecret = process.env.WOMPI_EVENTS_SECRET?.trim();
+
     if (!eventsSecret) {
       return res.status(500).json({ error: "Webhook no configurado" });
     }
 
-
-    // 🔐 Validar firma
     const isValid = validateWompiWebhook(payload, eventsSecret);
 
     if (!isValid) {
@@ -23,7 +24,6 @@ export async function wompiWebhook(req: Request, res: Response) {
       return res.status(401).json({ error: "Invalid signature" });
     }
 
-    // 🧠 Solo procesamos este evento
     if (payload.event !== "transaction.updated") {
       return res.status(200).json({ ok: true, ignored: true });
     }
@@ -37,74 +37,160 @@ export async function wompiWebhook(req: Request, res: Response) {
     const reference = transaction.reference;
     const wompiTransactionId = transaction.id ?? null;
     const wompiStatus = transaction.status ?? "PENDING";
-    const nextStatus = mapWompiStatusToInvoiceStatus(wompiStatus);
+    const nextInvoiceStatus = mapWompiStatusToInvoiceStatus(wompiStatus);
 
-    // 🔎 Buscar factura
-    const paymentLinkId = transaction.payment_link_id ?? null;
-
-    // Buscar por reference primero, si no por payment_link_id
-    const invoice = await prisma.invoice.findFirst({
-      where: {
-        OR: [
-          { invoiceNumber: reference },
-          { wompiPaymentLinkId: paymentLinkId ?? "" },
-        ],
-      },
+    const order = await prisma.order.findUnique({
+      where: { reference },
       include: { items: true },
     });
 
-    if (!invoice) {
-      console.warn(`⚠️ Invoice no encontrada: ${reference}`);
-      return res.status(200).json({ ok: true, warning: "invoice_not_found" });
+    if (!order) {
+      console.warn(`⚠️ Order no encontrada: ${reference}`);
+      return res.status(200).json({ ok: true, warning: "order_not_found" });
     }
 
-    // 🛑 Idempotencia fuerte (clave)
-    if (invoice.status === InvoiceStatus.PAID) {
-      return res.status(200).json({ ok: true, already_processed: true });
-    }
+    const mapOrderStatus = (status: string): OrderStatus => {
+      switch (status) {
+        case "APPROVED":
+          return OrderStatus.PAID;
+        case "DECLINED":
+          return OrderStatus.DECLINED;
+        case "VOIDED":
+        case "CANCELLED":
+          return OrderStatus.CANCELLED;
+        case "ERROR":
+          return OrderStatus.ERROR;
+        case "EXPIRED":
+          return OrderStatus.EXPIRED;
+        default:
+          return OrderStatus.PENDING;
+      }
+    };
 
-    // 🚀 Transacción atómica
+    const nextOrderStatus = mapOrderStatus(wompiStatus);
+
     await prisma.$transaction(async (tx) => {
-      // ✅ Actualizar por id de la factura encontrada, no por reference de Wompi
-      await tx.invoice.update({
-        where: { id: invoice.id },
+      const existingInvoice = await tx.invoice.findUnique({
+        where: { invoiceNumber: reference },
+      });
+
+      // Si no está aprobado, solo actualizamos la orden
+      if (nextInvoiceStatus !== InvoiceStatus.PAID) {
+        await tx.order.update({
+          where: { id: order.id },
+          data: {
+            status: nextOrderStatus,
+            wompiStatus,
+            wompiTransactionId,
+            paymentMethodType: transaction.payment_method_type ?? null,
+            wompiPayload: payload as unknown as Prisma.InputJsonValue,
+          },
+        });
+
+        return;
+      }
+
+      // Si ya existe factura, ya fue procesado antes
+      if (existingInvoice) {
+        await tx.order.update({
+          where: { id: order.id },
+          data: {
+            status: OrderStatus.PAID,
+            wompiStatus,
+            wompiTransactionId,
+            paymentMethodType: transaction.payment_method_type ?? null,
+            wompiPayload: payload as unknown as Prisma.InputJsonValue,
+            processedAt: order.processedAt ?? new Date(),
+          },
+        });
+
+        return;
+      }
+
+      // Validar stock antes de crear factura y descontar
+      for (const item of order.items) {
+        if (!item.productId) {
+          throw new Error(`El item ${item.id} no tiene productId`);
+        }
+
+        const product = await tx.product.findUnique({
+          where: { id: item.productId },
+        });
+
+        if (!product) {
+          throw new Error(`Producto no encontrado: ${item.productId}`);
+        }
+
+        if (product.stock < item.quantity) {
+          throw new Error(`Stock insuficiente para producto ${item.productId}`);
+        }
+      }
+
+      await tx.invoice.create({
         data: {
-          status: nextStatus,
+          invoiceNumber: reference,
+          customerName: order.customerName,
+          customerEmail: order.customerEmail,
+          customerPhone: order.customerPhone,
+          customerAddress: order.customerAddress,
+          customerPhonePrefix: order.customerPhonePrefix,
+          customerCountry: order.customerCountry,
+          customerDepartment: order.customerDepartment,
+          customerCity: order.customerCity,
+          documentType: order.documentType,
+          documentNumber: order.documentNumber,
+          subtotal: order.subtotal,
+          total: order.total,
+          status: InvoiceStatus.PAID,
+          wompiTransactionId,
+          wompiStatus,
+          paymentMethodType: transaction.payment_method_type ?? null,
+          wompiPayload: payload as unknown as Prisma.InputJsonValue,
+          wompiPaymentLinkId: order.wompiPaymentLinkId,
+          items: {
+            create: order.items.map((item) => ({
+              productId: item.productId,
+              productName: item.productName,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              lineTotal: item.lineTotal,
+              packageLabel: item.packageLabel,
+              unitsPerPackage: item.unitsPerPackage,
+              unitWeightGrams: item.unitWeightGrams,
+            })),
+          },
+        },
+      });
+
+      for (const item of order.items) {
+        if (!item.productId) continue;
+
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        });
+      }
+
+      await tx.order.update({
+        where: { id: order.id },
+        data: {
+          status: OrderStatus.PAID,
           wompiStatus,
           wompiTransactionId,
           paymentMethodType: transaction.payment_method_type ?? null,
           wompiPayload: payload as unknown as Prisma.InputJsonValue,
+          processedAt: new Date(),
         },
       });
-
-      // 2. Descontar stock SOLO si pagó
-      if (nextStatus === InvoiceStatus.PAID) {
-        for (const item of invoice.items) {
-          if (!item.productId) continue;
-
-          const product = await tx.product.findUnique({
-            where: { id: item.productId },
-          });
-
-          if (!product) {
-            throw new Error(`Producto no encontrado: ${item.productId}`);
-          }
-
-          if (product.stock < item.quantity) {
-            throw new Error(`Stock insuficiente para producto ${item.productId}`);
-          }
-
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: { decrement: item.quantity } },
-          });
-        }
-      }
     });
+
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("❌ Error en webhook de Wompi:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 }
-

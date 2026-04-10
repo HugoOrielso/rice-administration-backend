@@ -45,9 +45,70 @@ model Product {
   updatedAt DateTime @updatedAt
 
   invoiceItems InvoiceItem[]
+  orderItems   OrderItem[]
 
   @@index([name])
   @@index([isActive])
+}
+
+model Order {
+  id                  String      @id @default(cuid())
+  reference           String      @unique
+
+  customerName        String
+  customerEmail       String
+  customerPhone       String
+  customerAddress     String
+  customerPhonePrefix String      @default("+57")
+  documentType        DocumentType
+  documentNumber      String
+
+  customerCountry     String?     @default("Colombia")
+  customerDepartment  String?     @default("Norte de Santander")
+  customerCity        String?     @default("Villa del Rosario")
+
+  subtotal            Int         @default(0)
+  total               Int         @default(0)
+
+  status              OrderStatus @default(PENDING)
+
+  wompiTransactionId  String?
+  wompiStatus         String?
+  paymentMethodType   String?
+  wompiPayload        Json?
+  wompiPaymentLinkId  String?
+
+  processedAt         DateTime?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  items               OrderItem[]
+
+  @@index([customerEmail])
+  @@index([documentType])
+  @@index([documentNumber])
+  @@index([status])
+}
+
+model OrderItem {
+  id                String   @id @default(cuid())
+  orderId           String
+  productId         String?
+
+  productName       String
+  quantity          Int
+  unitPrice         Int      @default(0)
+  lineTotal         Int      @default(0)
+
+  packageLabel      String?
+  unitsPerPackage   Int?
+  unitWeightGrams   Decimal? @db.Decimal(10, 2)
+
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product           Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model Invoice {
@@ -94,7 +155,6 @@ model InvoiceItem {
   unitPrice   Int    @default(0)
   lineTotal   Int    @default(0)
 
-  // snapshot del producto al momento de vender
   packageLabel    String?
   unitsPerPackage Int?
   unitWeightGrams Decimal? @db.Decimal(10, 2)
@@ -104,6 +164,15 @@ model InvoiceItem {
 
   @@index([invoiceId])
   @@index([productId])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+  DECLINED
+  ERROR
 }
 
 enum InvoiceStatus {
@@ -128,4 +197,4 @@ enum DocumentType {
   DNI
   CARTEIRA_IDENTIDADE
   OTRO
-}
+} 

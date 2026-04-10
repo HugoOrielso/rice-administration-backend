@@ -43,24 +43,20 @@ export function validateWompiWebhook(
   return calculatedChecksum === receivedChecksum;
 }
 
-export function mapWompiStatusToInvoiceStatus(status?: string): InvoiceStatus {
+
+export function mapWompiStatusToInvoiceStatus(status: string): InvoiceStatus {
   switch (status) {
     case "APPROVED":
       return InvoiceStatus.PAID;
-
     case "DECLINED":
       return InvoiceStatus.DECLINED;
-
+    case "VOIDED":
+    case "CANCELLED":
+      return InvoiceStatus.CANCELLED;
     case "ERROR":
       return InvoiceStatus.ERROR;
-
-    case "VOIDED":
-      return InvoiceStatus.REFUNDED;
-
     case "EXPIRED":
       return InvoiceStatus.EXPIRED;
-
-    case "PENDING":
     default:
       return InvoiceStatus.PENDING;
   }

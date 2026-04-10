@@ -10,6 +10,8 @@
  */
 export type * from './models/User.ts'
 export type * from './models/Product.ts'
+export type * from './models/Order.ts'
+export type * from './models/OrderItem.ts'
 export type * from './models/Invoice.ts'
 export type * from './models/InvoiceItem.ts'
 export type * from './commonInputTypes.ts'

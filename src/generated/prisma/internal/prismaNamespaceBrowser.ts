@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Product: 'Product',
+  Order: 'Order',
+  OrderItem: 'OrderItem',
   Invoice: 'Invoice',
   InvoiceItem: 'InvoiceItem'
 } as const
@@ -106,6 +108,51 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const OrderScalarFieldEnum = {
+  id: 'id',
+  reference: 'reference',
+  customerName: 'customerName',
+  customerEmail: 'customerEmail',
+  customerPhone: 'customerPhone',
+  customerAddress: 'customerAddress',
+  customerPhonePrefix: 'customerPhonePrefix',
+  documentType: 'documentType',
+  documentNumber: 'documentNumber',
+  customerCountry: 'customerCountry',
+  customerDepartment: 'customerDepartment',
+  customerCity: 'customerCity',
+  subtotal: 'subtotal',
+  total: 'total',
+  status: 'status',
+  wompiTransactionId: 'wompiTransactionId',
+  wompiStatus: 'wompiStatus',
+  paymentMethodType: 'paymentMethodType',
+  wompiPayload: 'wompiPayload',
+  wompiPaymentLinkId: 'wompiPaymentLinkId',
+  processedAt: 'processedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  productId: 'productId',
+  productName: 'productName',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  lineTotal: 'lineTotal',
+  packageLabel: 'packageLabel',
+  unitsPerPackage: 'unitsPerPackage',
+  unitWeightGrams: 'unitWeightGrams'
+} as const
+
+export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
 
 
 export const InvoiceScalarFieldEnum = {

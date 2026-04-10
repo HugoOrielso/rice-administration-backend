@@ -735,10 +735,6 @@ export type InvoiceScalarRelationFilter = {
   isNot?: Prisma.InvoiceWhereInput
 }
 
-export type EnumDocumentTypeFieldUpdateOperationsInput = {
-  set?: $Enums.DocumentType
-}
-
 export type EnumInvoiceStatusFieldUpdateOperationsInput = {
   set?: $Enums.InvoiceStatus
 }
